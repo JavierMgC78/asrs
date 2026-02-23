@@ -1,21 +1,8 @@
-# ----------------------------------------------------------------------
-# ASRS - Perímetro de Seguridad y Reescritura de Rutas
-# ----------------------------------------------------------------------
-
-# 1. Bloquear la navegación de directorios (Seguridad Preventiva)
-Options -Indexes
-
-# 2. Activar el motor de reescritura de Apache
 RewriteEngine On
 
-# 3. Definir la base de la URL (opcional, ajusta si está en una subcarpeta)
-# RewriteBase /
-
-# 4. EXCEPCIONES: Si el archivo o carpeta solicitado existe físicamente,
-# permitir el acceso directo (para CSS, JS, Imágenes en assets).
+# Si el archivo o carpeta solicitado existe físicamente, se accede a él directamente (para CSS, JS, Imágenes)
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 
-# 5. REGLA MAESTRA: Todo lo demás se envía al index.php
-# El parámetro "url" llevará la ruta solicitada para que el Router la procese.
-RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+# Si no existe, todo se envía al index.php
+RewriteRule ^(.*)$ index.php [L,QSA]
