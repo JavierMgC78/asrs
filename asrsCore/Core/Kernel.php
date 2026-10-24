@@ -10,6 +10,9 @@ class Kernel
 {
     private string $cacheDir;
 
+    /** Roles y permisos en memoria (cache roles.php): ['roles' => [...], 'views' => [...]] */
+    private array $roles = ['roles' => [], 'views' => []];
+
     public function __construct(?string $cacheDir = null)
     {
         $this->cacheDir = rtrim($cacheDir ?? __DIR__ . '/../Cache', '/\\');
@@ -44,7 +47,18 @@ class Kernel
             ? (require $routesCacheFile)
             : [];
 
+        $rolesCacheFile = $this->cacheDir . '/roles.php';
+        if (CacheRolesBuilder::buildIfNotExists($rolesCacheFile)) {
+            $this->roles = require $rolesCacheFile;
+        }
+
         return [$routes, $apps];
+    }
+
+    /** Roles y permisos cargados en memoria, disponibles para el subsistema privado. */
+    public function roles(): array
+    {
+        return $this->roles;
     }
 
     private function notFound(): void
