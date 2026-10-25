@@ -99,22 +99,47 @@ body.asrs-admin-body {
     flex-direction: column;
     justify-content: space-between;
     padding: 1.5rem 1rem;
+    height: 100%;
+    overflow: hidden;
 }
 
 .sidebar-nav {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.5rem;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 4px;
+    flex: 1;
+}
+
+/* Scrollbar para la navegación del sidebar */
+.sidebar-nav::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+    background: rgba(0, 240, 255, 0.02);
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+    background: var(--border-wire);
+    border-radius: 2px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+    background: var(--neon-cyan);
 }
 
 .nav-link {
     color: var(--text-muted);
     text-decoration: none;
-    padding: 0.75rem 1rem;
+    padding: 0.65rem 0.85rem;
     border: 1px solid transparent;
     transition: all 0.2s ease;
     font-size: 0.9rem;
     letter-spacing: 1px;
+    display: block;
 }
 
 .nav-link:hover, .nav-link.active {
@@ -122,6 +147,114 @@ body.asrs-admin-body {
     border-color: var(--border-wire);
     background-color: rgba(0, 240, 255, 0.05);
     box-shadow: inset 0 0 10px rgba(0, 240, 255, 0.1);
+}
+
+/* Bloques de Navegación Acordeón */
+.sidebar-nav-group {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.sidebar-nav-group.open {
+    border-color: rgba(0, 240, 255, 0.2);
+    background: rgba(0, 240, 255, 0.02);
+}
+
+.nav-accordion-toggle {
+    width: 100%;
+    background-color: transparent;
+    color: var(--text-main);
+    border: 1px solid var(--border-wire);
+    padding: 0.65rem 0.85rem;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-align: left;
+    transition: all 0.2s ease;
+    user-select: none;
+}
+
+.nav-accordion-toggle:hover {
+    color: var(--neon-cyan);
+    border-color: var(--neon-cyan);
+    background-color: rgba(0, 240, 255, 0.08);
+    box-shadow: 0 0 8px rgba(0, 240, 255, 0.25);
+}
+
+.sidebar-nav-group.open .nav-accordion-toggle {
+    color: var(--neon-cyan);
+    border-color: var(--border-hover);
+    background-color: rgba(0, 240, 255, 0.06);
+    box-shadow: inset 0 0 6px rgba(0, 240, 255, 0.15);
+}
+
+.accordion-icon {
+    color: var(--neon-cyan);
+    font-weight: bold;
+    font-family: monospace;
+    font-size: 0.95rem;
+    display: inline-block;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.sidebar-nav-group.open .accordion-icon {
+    color: var(--neon-amber);
+    text-shadow: 0 0 6px rgba(255, 183, 3, 0.5);
+}
+
+.accordion-title {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Contenedor colapsable del submenú */
+.nav-accordion-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding-left: 0.65rem;
+    margin-left: 0.75rem;
+    border-left: 1px dashed var(--border-wire);
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.3s cubic-bezier(0, 1, 0, 1), opacity 0.25s ease, margin 0.25s ease, padding 0.25s ease;
+}
+
+.sidebar-nav-group.open .nav-accordion-body {
+    max-height: 350px;
+    opacity: 1;
+    margin-top: 0.4rem;
+    margin-bottom: 0.4rem;
+    padding-top: 0.2rem;
+    padding-bottom: 0.2rem;
+    transition: max-height 0.35s ease-in-out, opacity 0.3s ease, margin 0.25s ease;
+}
+
+.nav-link.sub-link {
+    font-size: 0.82rem;
+    padding: 0.45rem 0.65rem;
+    color: var(--text-muted);
+    border: 1px solid transparent;
+    border-left: 2px solid transparent;
+}
+
+.nav-link.sub-link:hover,
+.nav-link.sub-link.active {
+    color: var(--neon-cyan);
+    border-left-color: var(--neon-cyan);
+    background-color: rgba(0, 240, 255, 0.05);
+    border-color: rgba(0, 240, 255, 0.15);
+    border-left: 2px solid var(--neon-cyan);
 }
 
 .sidebar-footer {

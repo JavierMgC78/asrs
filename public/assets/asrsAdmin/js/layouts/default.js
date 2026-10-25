@@ -1,8 +1,51 @@
 /* ==========================================================================
-   ASRS Admin - Lógica de Interfaz y Control de Sesión (Split Token)
+   ASRS Admin - Lógica de Interfaz, Navegación Acordeón y Control de Sesión
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. Inicialización de los menús colapsables tipo acordeón del sidebar
+    initSidebarAccordions();
+
+    // 2. Control de cierre de sesión perimetral (Split Token)
+    initLogout();
+});
+
+/**
+ * Gestiona el comportamiento interactivo del sidebar colapsable.
+ * Alterna visibilidad y sincroniza los indicadores de consola ([+] / [-]).
+ */
+function initSidebarAccordions() {
+    const accordionToggles = document.querySelectorAll('.nav-accordion-toggle');
+
+    accordionToggles.forEach(toggle => {
+        const group = toggle.closest('.sidebar-nav-group');
+        const icon = toggle.querySelector('.accordion-icon');
+        const hasActiveSub = group && group.querySelector('.nav-link.active');
+
+        // Si el grupo contiene el enlace activo actual, iniciarlo desplegado
+        if (hasActiveSub && group) {
+            group.classList.add('open');
+            toggle.setAttribute('aria-expanded', 'true');
+            if (icon) icon.textContent = '[-]';
+        }
+
+        toggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (!group) return;
+
+            const isOpen = group.classList.toggle('open');
+            toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            if (icon) {
+                icon.textContent = isOpen ? '[-]' : '[+]';
+            }
+        });
+    });
+}
+
+/**
+ * Control del flujo de logout con Split Token.
+ */
+function initLogout() {
     const btnLogout = document.getElementById('btn-logout');
     
     if (btnLogout) {
@@ -28,4 +71,4 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-});
+}
