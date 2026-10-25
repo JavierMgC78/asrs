@@ -1,0 +1,171 @@
+/* ==========================================================================
+   ASRS Admin - Estética Neon Dark & Wireframe Outline UI
+   ========================================================================== */
+
+:root {
+    --bg-dark: #0b0f19;
+    --panel-bg: #111827;
+    --neon-cyan: #00f0ff;
+    --neon-red: #ff3366;
+    --neon-amber: #ffb703;
+    --text-main: #e5e7eb;
+    --text-muted: #9ca3af;
+    --border-wire: rgba(0, 240, 255, 0.3);
+    --border-hover: rgba(0, 240, 255, 0.8);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body.asrs-admin-body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: 'Courier New', Courier, monospace, sans-serif;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.asrs-app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* Header */
+.asrs-header {
+    height: 60px;
+    background-color: var(--panel-bg);
+    border-bottom: 1px solid var(--border-wire);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1.5rem;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.asrs-logo {
+    height: 32px;
+    width: auto;
+    filter: drop-shadow(0 0 4px var(--neon-cyan));
+}
+
+.system-name {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: var(--neon-cyan);
+    letter-spacing: 2px;
+    text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+}
+
+.user-info {
+    display: flex;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+    border: 1px solid var(--border-wire);
+    padding: 0.4rem 0.8rem;
+    background: rgba(0, 240, 255, 0.02);
+}
+
+.user-name {
+    color: var(--text-main);
+}
+
+.user-role {
+    color: var(--neon-amber);
+    font-weight: bold;
+}
+
+/* Main Wrapper */
+.asrs-main-wrapper {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Sidebar */
+.asrs-sidebar {
+    width: 280px;
+    background-color: var(--panel-bg);
+    border-right: 1px solid var(--border-wire);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1.5rem 1rem;
+}
+
+.sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.nav-link {
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 0.75rem 1rem;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: var(--neon-cyan);
+    border-color: var(--border-wire);
+    background-color: rgba(0, 240, 255, 0.05);
+    box-shadow: inset 0 0 10px rgba(0, 240, 255, 0.1);
+}
+
+.sidebar-footer {
+    padding-top: 1rem;
+    border-top: 1px dashed var(--border-wire);
+}
+
+.asrs-btn-logout {
+    width: 100%;
+    background-color: transparent;
+    color: var(--neon-red);
+    border: 1px solid var(--neon-red);
+    padding: 0.75rem;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: bold;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+}
+
+.asrs-btn-logout:hover {
+    background-color: var(--neon-red);
+    color: var(--bg-dark);
+    box-shadow: 0 0 12px rgba(255, 51, 102, 0.6);
+}
+
+/* Content Area */
+.asrs-content-area {
+    flex: 1;
+    background-color: var(--bg-dark);
+    padding: 2rem;
+    overflow-y: auto;
+    border: 1px dashed rgba(255, 255, 255, 0.05);
+}
+
+/* Footer */
+.asrs-footer {
+    height: 36px;
+    background-color: var(--panel-bg);
+    border-top: 1px solid var(--border-wire);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    letter-spacing: 1.5px;
+}

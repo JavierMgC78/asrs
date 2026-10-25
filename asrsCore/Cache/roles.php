@@ -91,5 +91,9 @@ return array (
     'asrsWeb|asrsweb/login' => 
     array (
     ),
+    'asrsAdmin|asrsadmin/dashboard' => 
+    array (
+      0 => 'superadmin',
+    ),
   ),
 );

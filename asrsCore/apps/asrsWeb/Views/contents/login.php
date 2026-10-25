@@ -4,7 +4,7 @@
             <h2>ACCESO AL SISTEMA ASRS</h2>
         </div>
         
-        <form id="asrsLoginForm" class="asrs-form" action="/auth/login" method="POST" novalidate>
+        <form id="asrsLoginForm" class="asrs-form" action="<?= htmlspecialchars($baseUrl ?? '/') ?>auth/login" method="POST" novalidate>
             
             <!-- SECCIÓN: CREDENCIALES DE ACCESO -->
             <div class="asrs-section" data-section="1">
@@ -17,8 +17,8 @@
                 <div class="asrs-section-content">
                     <div class="asrs-fields-grid" style="grid-template-columns: 1fr;">
                         <div class="asrs-field-group">
-                            <label for="username">IDENTIFICADOR / USUARIO</label>
-                            <input type="text" id="username" name="username" class="asrs-input" placeholder="Ingrese su usuario..." required>
+                            <label for="username">CORREO / USUARIO</label>
+                            <input type="email" id="username" name="username" class="asrs-input" placeholder="usuario@dominio.com" autocomplete="username" required>
                         </div>
                         <div class="asrs-field-group" style="margin-top: 15px;">
                             <label for="password">CONTRASEÑA PERIMETRAL</label>
@@ -49,6 +49,7 @@
             </div>
 
             <!-- ACCIONES GENERALES -->
+            <div id="asrsLoginError" role="alert" style="display:none;color:#ff6b6b;margin:10px 0;font-size:0.9rem"></div>
             <div class="asrs-form-actions">
                 <button type="submit" class="asrs-btn asrs-btn-primary">INICIAR SESIÓN</button>
             </div>

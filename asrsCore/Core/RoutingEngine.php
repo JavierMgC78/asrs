@@ -66,7 +66,7 @@ class RoutingEngine {
             }
         }
 
-        if ($route === null || ($route['type'] ?? 'public') !== 'public') {
+        if ($route === null || !in_array($route['type'] ?? 'public', ['public', 'private'], true)) {
             return null;
         }
 

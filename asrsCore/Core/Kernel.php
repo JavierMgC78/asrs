@@ -13,6 +13,8 @@ class Kernel
     /** Roles y permisos en memoria (cache roles.php): ['roles' => [...], 'views' => [...]] */
     private array $roles = ['roles' => [], 'views' => []];
 
+    private const AUTH_ENDPOINTS = ['auth/login' => 'login', 'auth/logout' => 'logout'];
+
     public function __construct(?string $cacheDir = null)
     {
         $this->cacheDir = rtrim($cacheDir ?? __DIR__ . '/../Cache', '/\\');
@@ -21,6 +23,13 @@ class Kernel
     public function handleRequest(?string $uri = null): void
     {
         $uri ??= $_GET['uri'] ?? '';
+
+        // Endpoints reservados del subsistema de autenticación
+        $authMethod = self::AUTH_ENDPOINTS[trim($uri, '/')] ?? null;
+        if ($authMethod !== null) {
+            (new \asrsCore\Controllers\AuthController())->{$authMethod}();
+            return;
+        }
 
         [$routes, $apps] = $this->loadCaches();
 
@@ -31,7 +40,12 @@ class Kernel
             return;
         }
 
-        $this->render($route, $uri);
+        // Interceptor perimetral: las rutas privadas exigen Split Token válido
+        if (($route['type'] ?? 'public') === 'private') {
+            $currentUser = Security::guard($route);
+        }
+
+        $this->render($route, $uri, $currentUser ?? null);
     }
 
     /** Carga (y genera si faltan) las cachés de apps y rutas. */
@@ -77,7 +91,7 @@ class Kernel
         return $scheme . '://' . $_SERVER['HTTP_HOST'] . $scriptDir . '/';
     }
 
-    private function render(array $route, string $uri): void
+    private function render(array $route, string $uri, ?array $currentUser = null): void
     {
         // Variables disponibles en el layout: $route, $baseUrl, $content, $cssFiles, $jsFiles, $currentUri
         $baseUrl     = $this->computeBaseUrl();

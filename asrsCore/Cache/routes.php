@@ -255,5 +255,21 @@ return array (
     'css_path_view' => NULL,
     'js_path_view' => NULL,
   ),
+  'asrsAdmin|asrsadmin/dashboard' => 
+  array (
+    'uri' => 'asrsadmin/dashboard',
+    'app' => 'asrsAdmin',
+    'type' => 'private',
+    'controller' => '',
+    'method' => '',
+    'layout' => 'default',
+    'content' => 'dashboard',
+    'roles' => 
+    array (
+      0 => 'superadmin',
+    ),
+    'css_path_view' => NULL,
+    'js_path_view' => NULL,
+  ),
   '@default_app' => 'pablitoClavoUnClavito',
 );
