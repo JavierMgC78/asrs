@@ -294,6 +294,37 @@ class AdminController
         }
     }
 
+    /**
+     * Control perimetral para el Gestor de Usuarios.
+     * Valida de forma estricta que el usuario activo posea el rol 'superadmin'.
+     *
+     * @return array Datos de sesión y contexto del módulo.
+     */
+    public function usersIndex(): array
+    {
+        $user = Security::authenticate();
+        if ($user === null || !in_array(Security::ADMIN_ROLE, (array)($user['roles'] ?? []), true)) {
+            if (($_SERVER['HTTP_ACCEPT'] ?? '') === 'application/json' || (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest')) {
+                $this->json(['ok' => false, 'error' => Security::DENIED_MESSAGE], 403);
+            }
+            header('Location: ' . Security::url(Security::LOGIN_URI), true, 302);
+            exit;
+        }
+
+        $payload = [
+            'ok'          => true,
+            'currentUser' => $user,
+            'title'       => 'GESTOR DE USUARIOS',
+            'timestamp'   => time(),
+        ];
+
+        if (($_SERVER['HTTP_ACCEPT'] ?? '') === 'application/json') {
+            $this->json($payload);
+        }
+
+        return $payload;
+    }
+
     private function json(array $data, int $status = 200): never
     {
         http_response_code($status);

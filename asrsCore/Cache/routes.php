@@ -303,5 +303,37 @@ return array (
     'css_path_view' => NULL,
     'js_path_view' => NULL,
   ),
+  'asrsAdmin|admin/users' => 
+  array (
+    'uri' => 'admin/users',
+    'app' => 'asrsAdmin',
+    'type' => 'private',
+    'controller' => 'AdminController',
+    'method' => 'usersIndex',
+    'layout' => 'default',
+    'content' => 'users/index',
+    'roles' => 
+    array (
+      0 => 'superadmin',
+    ),
+    'css_path_view' => NULL,
+    'js_path_view' => NULL,
+  ),
+  'asrsAdmin|asrsadmin/users' => 
+  array (
+    'uri' => 'asrsadmin/users',
+    'app' => 'asrsAdmin',
+    'type' => 'private',
+    'controller' => 'AdminController',
+    'method' => 'usersIndex',
+    'layout' => 'default',
+    'content' => 'users/index',
+    'roles' => 
+    array (
+      0 => 'superadmin',
+    ),
+    'css_path_view' => NULL,
+    'js_path_view' => NULL,
+  ),
   '@default_app' => 'LaGuitarraDeLolo',
 );

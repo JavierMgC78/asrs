@@ -49,6 +49,7 @@
                             <span class="accordion-title">[ Rol: superadmin ]</span>
                         </button>
                         <div class="nav-accordion-body">
+                            <a href="admin/users" class="nav-link sub-link <?= ($activeUri === 'admin/users' || $activeUri === 'asrsadmin/users') ? 'active' : '' ?>">&gt; Gestor de Usuarios</a>
                             <a href="admin/routes" class="nav-link sub-link <?= ($activeUri === 'admin/routes' || $activeUri === 'asrsadmin/routes') ? 'active' : '' ?>">&gt; Rutas & Caché</a>
                             <a href="admin/roles" class="nav-link sub-link <?= ($activeUri === 'admin/roles') ? 'active' : '' ?>">&gt; Roles & Permisos</a>
                         </div>
