@@ -34,32 +34,33 @@
                 $isAdmin      = $isSuperAdmin || in_array('admin', $userRoles, true);
                 $isCashier    = $isSuperAdmin || in_array('cashregister', $userRoles, true);
                 $isTeacher    = $isSuperAdmin || in_array('teacher', $userRoles, true);
+                $isStudent    = $isSuperAdmin || in_array('student', $userRoles, true);
                 $activeUri    = $currentUri ?? '';
                 ?>
                 <nav class="sidebar-nav">
                     <!-- Dashboard Principal -->
                     <a href="asrsadmin/dashboard" class="nav-link <?= ($activeUri === 'asrsadmin/dashboard' || $activeUri === '') ? 'active' : '' ?>">[ Dashboard ]</a>
 
-                    <!-- Módulo: Núcleo & Sistema (Superadmin) -->
+                    <!-- Acordeón: Rol superadmin -->
                     <?php if ($isSuperAdmin): ?>
                     <div class="sidebar-nav-group">
                         <button type="button" class="nav-accordion-toggle" aria-expanded="false">
                             <span class="accordion-icon">[+]</span>
-                            <span class="accordion-title">[ SISTEMA & NÚCLEO ]</span>
+                            <span class="accordion-title">[ Rol: superadmin ]</span>
                         </button>
                         <div class="nav-accordion-body">
-                            <a href="admin/routes" class="nav-link sub-link <?= ($activeUri === 'admin/routes') ? 'active' : '' ?>">&gt; Rutas & Caché</a>
+                            <a href="admin/routes" class="nav-link sub-link <?= ($activeUri === 'admin/routes' || $activeUri === 'asrsadmin/routes') ? 'active' : '' ?>">&gt; Rutas & Caché</a>
                             <a href="admin/roles" class="nav-link sub-link <?= ($activeUri === 'admin/roles') ? 'active' : '' ?>">&gt; Roles & Permisos</a>
                         </div>
                     </div>
                     <?php endif; ?>
 
-                    <!-- Módulo: Seguridad & Usuarios (Superadmin y Admin) -->
+                    <!-- Acordeón: Rol admin -->
                     <?php if ($isAdmin): ?>
                     <div class="sidebar-nav-group">
                         <button type="button" class="nav-accordion-toggle" aria-expanded="false">
                             <span class="accordion-icon">[+]</span>
-                            <span class="accordion-title">[ USUARIOS & ACL ]</span>
+                            <span class="accordion-title">[ Rol: admin ]</span>
                         </button>
                         <div class="nav-accordion-body">
                             <a href="admin/users" class="nav-link sub-link <?= ($activeUri === 'admin/users') ? 'active' : '' ?>">&gt; Gestión de Usuarios</a>
@@ -68,12 +69,12 @@
                     </div>
                     <?php endif; ?>
 
-                    <!-- Módulo: Finanzas & Caja (Superadmin y Cajero) -->
+                    <!-- Acordeón: Rol cashregister -->
                     <?php if ($isCashier): ?>
                     <div class="sidebar-nav-group">
                         <button type="button" class="nav-accordion-toggle" aria-expanded="false">
                             <span class="accordion-icon">[+]</span>
-                            <span class="accordion-title">[ CAJA & FINANZAS ]</span>
+                            <span class="accordion-title">[ Rol: cashregister ]</span>
                         </button>
                         <div class="nav-accordion-body">
                             <a href="admin/cashregister" class="nav-link sub-link <?= ($activeUri === 'admin/cashregister') ? 'active' : '' ?>">&gt; Terminal de Caja</a>
@@ -82,16 +83,30 @@
                     </div>
                     <?php endif; ?>
 
-                    <!-- Módulo: Gestión Académica (Superadmin y Docente) -->
+                    <!-- Acordeón: Rol teacher -->
                     <?php if ($isTeacher): ?>
                     <div class="sidebar-nav-group">
                         <button type="button" class="nav-accordion-toggle" aria-expanded="false">
                             <span class="accordion-icon">[+]</span>
-                            <span class="accordion-title">[ PORTAL ACADÉMICO ]</span>
+                            <span class="accordion-title">[ Rol: teacher ]</span>
                         </button>
                         <div class="nav-accordion-body">
                             <a href="admin/academic/groups" class="nav-link sub-link <?= ($activeUri === 'admin/academic/groups') ? 'active' : '' ?>">&gt; Control de Grupos</a>
                             <a href="admin/academic/attendance" class="nav-link sub-link <?= ($activeUri === 'admin/academic/attendance') ? 'active' : '' ?>">&gt; Registro Asistencias</a>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+
+                    <!-- Acordeón: Rol student -->
+                    <?php if ($isStudent): ?>
+                    <div class="sidebar-nav-group">
+                        <button type="button" class="nav-accordion-toggle" aria-expanded="false">
+                            <span class="accordion-icon">[+]</span>
+                            <span class="accordion-title">[ Rol: student ]</span>
+                        </button>
+                        <div class="nav-accordion-body">
+                            <a href="portal/calificaciones" class="nav-link sub-link <?= ($activeUri === 'portal/calificaciones') ? 'active' : '' ?>">&gt; Consulta Académica</a>
+                            <a href="portal/kardex" class="nav-link sub-link <?= ($activeUri === 'portal/kardex') ? 'active' : '' ?>">&gt; Historial / Kardex</a>
                         </div>
                     </div>
                     <?php endif; ?>

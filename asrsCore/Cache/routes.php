@@ -271,5 +271,37 @@ return array (
     'css_path_view' => NULL,
     'js_path_view' => NULL,
   ),
+  'asrsAdmin|admin/routes' => 
+  array (
+    'uri' => 'admin/routes',
+    'app' => 'asrsAdmin',
+    'type' => 'private',
+    'controller' => 'AdminController',
+    'method' => 'routesIndex',
+    'layout' => 'default',
+    'content' => 'routes/index',
+    'roles' => 
+    array (
+      0 => 'superadmin',
+    ),
+    'css_path_view' => NULL,
+    'js_path_view' => NULL,
+  ),
+  'asrsAdmin|asrsadmin/routes' => 
+  array (
+    'uri' => 'asrsadmin/routes',
+    'app' => 'asrsAdmin',
+    'type' => 'private',
+    'controller' => 'AdminController',
+    'method' => 'routesIndex',
+    'layout' => 'default',
+    'content' => 'routes/index',
+    'roles' => 
+    array (
+      0 => 'superadmin',
+    ),
+    'css_path_view' => NULL,
+    'js_path_view' => NULL,
+  ),
   '@default_app' => 'LaGuitarraDeLolo',
 );
