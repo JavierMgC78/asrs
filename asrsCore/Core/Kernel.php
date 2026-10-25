@@ -31,6 +31,12 @@ class Kernel
             return;
         }
 
+        // Endpoint administrativo de regeneración de caché
+        if (trim($uri, '/') === 'admin/cache/regenerate') {
+            (new \asrsCore\Controllers\AdminController())->regenerateCache();
+            return;
+        }
+
         [$routes, $apps] = $this->loadCaches();
 
         $route = RoutingEngine::resolve($uri, $routes, $apps);
@@ -55,15 +61,33 @@ class Kernel
         $apps = CacheAppsBuilder::buildIfNotExists($appsCacheFile)
             ? (require $appsCacheFile)
             : [];
+        if (!is_array($apps)) {
+            @unlink($appsCacheFile);
+            CacheAppsBuilder::buildIfNotExists($appsCacheFile);
+            $apps = is_file($appsCacheFile) ? (require $appsCacheFile) : [];
+            $apps = is_array($apps) ? $apps : [];
+        }
 
         $routesCacheFile = $this->cacheDir . '/routes.php';
         $routes = CacheRoutesBuilder::buildIfNotExists($routesCacheFile)
             ? (require $routesCacheFile)
             : [];
+        if (!is_array($routes)) {
+            @unlink($routesCacheFile);
+            CacheRoutesBuilder::buildIfNotExists($routesCacheFile);
+            $routes = is_file($routesCacheFile) ? (require $routesCacheFile) : [];
+            $routes = is_array($routes) ? $routes : [];
+        }
 
         $rolesCacheFile = $this->cacheDir . '/roles.php';
         if (CacheRolesBuilder::buildIfNotExists($rolesCacheFile)) {
-            $this->roles = require $rolesCacheFile;
+            $loadedRoles = require $rolesCacheFile;
+            if (!is_array($loadedRoles)) {
+                @unlink($rolesCacheFile);
+                CacheRolesBuilder::buildIfNotExists($rolesCacheFile);
+                $loadedRoles = is_file($rolesCacheFile) ? (require $rolesCacheFile) : [];
+            }
+            $this->roles = is_array($loadedRoles) ? $loadedRoles : ['roles' => [], 'views' => []];
         }
 
         return [$routes, $apps];

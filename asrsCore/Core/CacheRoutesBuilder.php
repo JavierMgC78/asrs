@@ -15,7 +15,7 @@ class CacheRoutesBuilder {
      * Las rutas se indexan como "app|uri" para búsqueda O(1).
      */
     public static function buildIfNotExists(string $cacheFilePath = self::DEFAULT_CACHE_FILE): bool {
-        if (is_file($cacheFilePath)) {
+        if (is_file($cacheFilePath) && filesize($cacheFilePath) > 0) {
             return true;
         }
 

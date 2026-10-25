@@ -271,5 +271,5 @@ return array (
     'css_path_view' => NULL,
     'js_path_view' => NULL,
   ),
-  '@default_app' => 'pablitoClavoUnClavito',
+  '@default_app' => 'LaGuitarraDeLolo',
 );

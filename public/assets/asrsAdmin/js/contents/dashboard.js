@@ -20,17 +20,60 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     if (btnRefreshCache) {
-        btnRefreshCache.addEventListener('click', () => {
-            const actionLogs = [
-                "[ACTION] Solicitando regeneración de archivos de caché...",
-                "[OK] CacheRoutesBuilder regenerado con éxito.",
-                "[OK] CacheRolesBuilder regenerado con éxito.",
-                "[SYSTEM] Estado del núcleo sincronizado al 100%."
-            ];
+        btnRefreshCache.addEventListener('click', async () => {
+            if (btnRefreshCache.disabled) return;
+            btnRefreshCache.disabled = true;
 
-            playTerminalSequence(actionLogs, 0, () => {
-                loadSystemMetrics();
-            });
+            const tokenB = sessionStorage.getItem('asrs_validator') || localStorage.getItem('asrs_token_b');
+            const headers = { 'Accept': 'application/json' };
+            if (tokenB) {
+                headers['Authorization'] = `Bearer ${tokenB}`;
+            }
+
+            try {
+                const response = await fetch('admin/cache/regenerate', {
+                    method: 'POST',
+                    headers: headers,
+                    credentials: 'same-origin'
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.ok) {
+                    const actionLogs = [
+                        "[ACTION] Solicitando regeneración de archivos de caché...",
+                        "[OK] CacheRoutesBuilder regenerado con éxito.",
+                        "[OK] CacheRolesBuilder regenerado con éxito.",
+                        "[SYSTEM] Estado del núcleo sincronizado al 100%."
+                    ];
+
+                    playTerminalSequence(actionLogs, 0, () => {
+                        if (data.routes && data.routes.count !== undefined) {
+                            document.getElementById('routes-count').textContent = String(data.routes.count).padStart(2, '0');
+                        }
+                        if (data.roles && data.roles.count !== undefined) {
+                            document.getElementById('roles-count').textContent = String(data.roles.count).padStart(2, '0');
+                        }
+                        btnRefreshCache.disabled = false;
+                    });
+                } else {
+                    const errorLogs = [
+                        "[ACTION] Solicitando regeneración de archivos de caché...",
+                        `[ERROR] Fallo al regenerar cachés: ${data.error || 'Acceso denegado'}`
+                    ];
+                    playTerminalSequence(errorLogs, 0, () => {
+                        btnRefreshCache.disabled = false;
+                    });
+                }
+            } catch (err) {
+                const failLogs = [
+                    "[ACTION] Solicitando regeneración de archivos de caché...",
+                    "[ERROR] Fallo de conexión perimetral al regenerar cachés."
+                ];
+                playTerminalSequence(failLogs, 0, () => {
+                    btnRefreshCache.disabled = false;
+                });
+            }
         });
     }
 

@@ -15,7 +15,7 @@ class CacheRolesBuilder {
      *  - 'views' => [ "app|uri"  => [nombre_rol, ...] ]                       (roles permitidos por vista)
      */
     public static function buildIfNotExists(string $cacheFilePath = self::DEFAULT_CACHE_FILE): bool {
-        if (is_file($cacheFilePath)) {
+        if (is_file($cacheFilePath) && filesize($cacheFilePath) > 0) {
             return true;
         }
 

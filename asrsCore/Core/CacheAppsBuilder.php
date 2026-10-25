@@ -9,7 +9,7 @@ class CacheAppsBuilder {
      * Si ya existe no hace nada y retorna true.
      */
     public static function buildIfNotExists(string $cacheFilePath): bool {
-        if (is_file($cacheFilePath)) {
+        if (is_file($cacheFilePath) && filesize($cacheFilePath) > 0) {
             return true;
         }
 
