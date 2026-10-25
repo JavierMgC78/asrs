@@ -185,23 +185,25 @@ $currentUser = $viewData['currentUser'] ?? null;
     font-weight: bold;
 }
 
-/* Grid de Tarjetas */
+/* Grid de Tarjetas (Alineación en una sola fila de 4 columnas) */
 .users-cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.15rem;
+    align-items: stretch;
 }
 
 .user-action-card {
     background-color: var(--panel-bg);
     border: 1px solid var(--border-wire);
-    padding: 1.4rem;
+    padding: 1.25rem 1.05rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 1.25rem;
+    gap: 1.1rem;
     transition: all 0.25s ease;
     position: relative;
+    min-width: 0; /* Previene overflow en grid 1fr */
 }
 
 .user-action-card:hover {
@@ -241,20 +243,25 @@ $currentUser = $viewData['currentUser'] ?? null;
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
-    padding-bottom: 0.6rem;
+    padding-bottom: 0.55rem;
+    gap: 0.4rem;
 }
 
 .card-code {
-    font-size: 0.75rem;
-    letter-spacing: 1.5px;
+    font-size: 0.72rem;
+    letter-spacing: 1px;
     font-weight: bold;
     color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .card-status {
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     letter-spacing: 1px;
     font-weight: bold;
+    white-space: nowrap;
 }
 
 .card-status.active {
@@ -275,14 +282,15 @@ $currentUser = $viewData['currentUser'] ?? null;
 .card-content {
     display: flex;
     flex-direction: column;
-    gap: 0.65rem;
+    gap: 0.6rem;
 }
 
 .card-title {
-    font-size: 1.15rem;
+    font-size: 1.05rem;
     font-weight: bold;
-    letter-spacing: 1px;
+    letter-spacing: 0.8px;
     color: var(--text-main);
+    line-height: 1.3;
     margin: 0;
 }
 
@@ -299,48 +307,54 @@ $currentUser = $viewData['currentUser'] ?? null;
 }
 
 .card-description {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--text-muted);
-    line-height: 1.5;
-    letter-spacing: 0.3px;
+    line-height: 1.45;
+    letter-spacing: 0.2px;
     margin: 0;
 }
 
 .card-bottom {
     display: flex;
     flex-direction: column;
-    gap: 0.85rem;
+    gap: 0.75rem;
     border-top: 1px dashed rgba(255, 255, 255, 0.08);
-    padding-top: 0.85rem;
+    padding-top: 0.75rem;
 }
 
 .card-meta {
     display: flex;
     justify-content: space-between;
-    font-size: 0.72rem;
+    gap: 0.35rem;
+    font-size: 0.68rem;
     color: var(--text-muted);
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
+    flex-wrap: wrap;
 }
 
 .meta-item {
     background: rgba(0, 0, 0, 0.35);
-    padding: 0.2rem 0.45rem;
+    padding: 0.2rem 0.35rem;
     border: 1px solid rgba(255, 255, 255, 0.05);
+    white-space: nowrap;
 }
 
 .asrs-btn-card {
     width: 100%;
-    padding: 0.65rem 1rem;
+    padding: 0.6rem 0.4rem;
     background: transparent;
     font-family: inherit;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: bold;
-    letter-spacing: 1.5px;
+    letter-spacing: 1px;
     cursor: not-allowed;
     text-align: center;
     border: 1px solid transparent;
     transition: all 0.2s;
     opacity: 0.65;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .asrs-btn-card.btn-cyan {
@@ -360,6 +374,19 @@ $currentUser = $viewData['currentUser'] ?? null;
 
 .asrs-btn-card.disabled:hover {
     opacity: 0.85;
+}
+
+/* Responsividad para pantallas reducidas */
+@media (max-width: 1200px) {
+    .users-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 680px) {
+    .users-cards-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* Panel de Aviso */
