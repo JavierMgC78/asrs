@@ -302,6 +302,11 @@ class AdminController
      */
     public function usersIndex(): array
     {
+        // Si la petición es POST, delegar al endpoint de almacenamiento
+        if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
+            $this->storeUser();
+        }
+
         $user = Security::authenticate();
         if ($user === null || !in_array(Security::ADMIN_ROLE, (array)($user['roles'] ?? []), true)) {
             if (($_SERVER['HTTP_ACCEPT'] ?? '') === 'application/json' || (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest')) {
@@ -323,6 +328,133 @@ class AdminController
         }
 
         return $payload;
+    }
+
+    /**
+     * Endpoint POST para registrar un nuevo usuario en la tabla asrs_users
+     * y asociar su rol institucional en asrs_user_roles.
+     * Acceso exclusivo para superadministradores.
+     */
+    public function storeUser(): never
+    {
+        // 1. Verificación de método POST
+        if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+            $this->json(['ok' => false, 'error' => 'Método no permitido'], 405);
+        }
+
+        // 2. Verificación de sesión de superadmin
+        $user = Security::authenticate();
+        if ($user === null || !in_array(Security::ADMIN_ROLE, (array)($user['roles'] ?? []), true)) {
+            $this->json(['ok' => false, 'error' => Security::DENIED_MESSAGE], 403);
+        }
+
+        // 3. Obtener payload (JSON o form-data)
+        $input = [];
+        $raw = file_get_contents('php://input');
+        if (!empty($raw)) {
+            $decodedJson = json_decode($raw, true);
+            if (is_array($decodedJson)) {
+                $input = $decodedJson;
+            }
+        }
+        if (empty($input)) {
+            $input = $_POST;
+        }
+
+        $name     = trim((string)($input['name'] ?? ''));
+        $email    = trim((string)($input['email'] ?? ''));
+        $role     = trim((string)($input['role'] ?? 'student'));
+        $password = (string)($input['password'] ?? '');
+
+        // 4. Validaciones obligatorias de campos clave
+        if ($name === '') {
+            $this->json(['ok' => false, 'error' => 'El nombre completo es obligatorio'], 422);
+        }
+
+        if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $this->json(['ok' => false, 'error' => 'Correo institucional inválido o vacío'], 422);
+        }
+
+        if ($password === '' || strlen($password) < 6) {
+            $this->json(['ok' => false, 'error' => 'La contraseña debe contener al menos 6 caracteres'], 422);
+        }
+
+        $allowedRoles = ['superadmin', 'admin', 'cashregister', 'teacher', 'student'];
+        if (!in_array($role, $allowedRoles, true)) {
+            $this->json(['ok' => false, 'error' => 'Rol institucional no permitido'], 422);
+        }
+
+        try {
+            $pdo = Conection::getInstance();
+
+            // Verificar si el correo ya existe en asrs_users
+            $checkEmail = $pdo->prepare("SELECT id FROM asrs_users WHERE email = :email LIMIT 1");
+            $checkEmail->execute([':email' => $email]);
+            if ($checkEmail->fetch()) {
+                $this->json(['ok' => false, 'error' => "El correo institucional '{$email}' ya se encuentra registrado"], 409);
+            }
+
+            // Buscar ID del rol en la tabla roles
+            $stmtRole = $pdo->prepare("SELECT id FROM roles WHERE name = :role LIMIT 1");
+            $stmtRole->execute([':role' => $role]);
+            $roleId = $stmtRole->fetchColumn();
+
+            // Respaldo de inserción si el rol no estuviera en la tabla roles
+            if (!$roleId) {
+                $stmtNewRole = $pdo->prepare("INSERT INTO roles (name, display_name, status) VALUES (:name, :display, 1)");
+                $stmtNewRole->execute([':name' => $role, ':display' => ucfirst($role)]);
+                $roleId = (int)$pdo->lastInsertId();
+            }
+
+            // Procesar hash seguro bcrypt (cost 12)
+            $passwordHash = password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
+
+            // Inserción en la tabla asrs_users
+            $stmtUser = $pdo->prepare("
+                INSERT INTO asrs_users (name, email, password_hash, status, created_at, updated_at)
+                VALUES (:name, :email, :password_hash, 1, NOW(), NOW())
+            ");
+            $stmtUser->execute([
+                ':name'          => $name,
+                ':email'         => $email,
+                ':password_hash' => $passwordHash,
+            ]);
+            $newUserId = (int)$pdo->lastInsertId();
+
+            // Inserción de la asignación de rol en asrs_user_roles
+            $stmtUserRole = $pdo->prepare("
+                INSERT INTO asrs_user_roles (user_id, role_id)
+                VALUES (:user_id, :role_id)
+            ");
+            $stmtUserRole->execute([
+                ':user_id' => $newUserId,
+                ':role_id' => (int)$roleId,
+            ]);
+
+            // Total de usuarios registrados
+            $usersCount = (int)$pdo->query("SELECT COUNT(*) FROM asrs_users")->fetchColumn();
+
+            $this->json([
+                'ok'         => true,
+                'message'    => "Usuario '{$name}' aprovisionado exitosamente en el núcleo ASRS.",
+                'user'       => [
+                    'id'         => $newUserId,
+                    'name'       => $name,
+                    'email'      => $email,
+                    'role'       => $role,
+                    'roles'      => $role,
+                    'status'     => 1,
+                    'created_at' => date('Y-m-d H:i:s'),
+                ],
+                'usersCount' => $usersCount,
+            ], 201);
+
+        } catch (Throwable $e) {
+            $this->json([
+                'ok'    => false,
+                'error' => 'Fallo al persistir el usuario: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     private function json(array $data, int $status = 200): never

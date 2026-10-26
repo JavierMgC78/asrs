@@ -22,6 +22,12 @@ document.addEventListener('DOMContentLoaded', () => {
         formRoute.addEventListener('submit', handleRouteFormSubmit);
     }
 
+    // Escucha para el formulario de aprovisionamiento de usuario (USR-02)
+    const formUser = document.getElementById('form-create-user');
+    if (formUser) {
+        formUser.addEventListener('submit', handleUserFormSubmit);
+    }
+
     // Cierre con Escape o clic en el backdrop
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
@@ -334,4 +340,185 @@ function closeCreateUserModal() {
         modal.style.display = 'none';
         modal.setAttribute('aria-hidden', 'true');
     }
+}
+
+/**
+ * Envío asíncrono del formulario mediante Fetch para aprovisionar un nuevo usuario
+ * y actualizar la tabla en tiempo real sin recargar la página.
+ */
+async function handleUserFormSubmit(event) {
+    if (event) event.preventDefault();
+
+    const submitBtn = document.getElementById('btn-submit-user');
+    const alertBanner = document.getElementById('modal-user-alert-banner');
+
+    const name = document.getElementById('user-input-name')?.value.trim() || '';
+    const email = document.getElementById('user-input-email')?.value.trim() || '';
+    const role = document.getElementById('user-input-role')?.value || 'student';
+    const password = document.getElementById('user-input-password')?.value || '';
+
+    // Validaciones locales
+    if (!name || !email || !password) {
+        if (alertBanner) {
+            alertBanner.className = 'modal-alert error';
+            alertBanner.style.display = 'block';
+            alertBanner.textContent = '[!] Todos los campos obligatorios deben ser completados.';
+        }
+        return;
+    }
+
+    if (password.length < 6) {
+        if (alertBanner) {
+            alertBanner.className = 'modal-alert error';
+            alertBanner.style.display = 'block';
+            alertBanner.textContent = '[!] La contraseña debe contener al menos 6 caracteres.';
+        }
+        return;
+    }
+
+    // Estado visual de carga
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="btn-indicator">⚡</span> [ APROVISIONANDO... ]';
+    }
+
+    const payload = {
+        name: name,
+        email: email,
+        role: role,
+        password: password
+    };
+
+    const tokenB = sessionStorage.getItem('asrs_validator') || localStorage.getItem('asrs_token_b');
+    const headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    };
+    if (tokenB) headers['Authorization'] = `Bearer ${tokenB}`;
+
+    try {
+        const response = await fetch('admin/users', {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(payload),
+            credentials: 'same-origin'
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.ok) {
+            // 1. Cerrar el modal
+            closeCreateUserModal();
+
+            // 2. Limpiar el formulario
+            const form = document.getElementById('form-create-user');
+            if (form) form.reset();
+
+            // 3. Notificación tipo consola en la página principal
+            if (typeof showConsoleBanner === 'function') {
+                showConsoleBanner(`[OK] ${data.message || 'Usuario aprovisionado exitosamente.'}`);
+            }
+
+            // 4. Actualizar tabla en tiempo real sin recargar página
+            insertUserTableRow(data.user);
+
+            // 5. Actualizar contador de usuarios
+            if (data.usersCount !== undefined) {
+                const countBadges = document.querySelectorAll('.drawer-count-badge');
+                countBadges.forEach(badge => {
+                    badge.textContent = `[ ${data.usersCount} REGISTRO(S) ]`;
+                });
+            }
+
+            // 6. Abrir drawer de catálogo si está cerrado para visualizar el nuevo registro
+            const drawer = document.getElementById('users-catalog-drawer');
+            const btnToggle = document.getElementById('btn-toggle-users-catalog');
+            if (drawer && !drawer.classList.contains('open') && typeof openCatalog === 'function') {
+                openCatalog();
+            } else if (drawer && !drawer.classList.contains('open')) {
+                drawer.classList.add('open');
+                drawer.setAttribute('aria-hidden', 'false');
+                if (btnToggle) {
+                    btnToggle.setAttribute('aria-expanded', 'true');
+                    btnToggle.classList.add('is-open');
+                    const btnText = btnToggle.querySelector('.btn-catalog-text');
+                    if (btnText) btnText.textContent = '[ OCULTAR CATÁLOGO ▲ ]';
+                }
+            }
+        } else {
+            if (alertBanner) {
+                alertBanner.className = 'modal-alert error';
+                alertBanner.style.display = 'block';
+                alertBanner.textContent = `[ERROR] ${data.error || 'Fallo al aprovisionar el usuario.'}`;
+            }
+        }
+    } catch (error) {
+        if (alertBanner) {
+            alertBanner.className = 'modal-alert error';
+            alertBanner.style.display = 'block';
+            alertBanner.textContent = `[ERROR DE RED] No se pudo establecer conexión con el núcleo ASRS: ${error.message}`;
+        }
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = '[ GUARDAR ]';
+        }
+    }
+}
+
+/**
+ * Inserta un nuevo usuario al inicio de la tabla del catálogo con resaltado wireframe.
+ */
+function insertUserTableRow(user) {
+    if (!user) return;
+    const tbody = document.getElementById('users-table-body');
+    if (!tbody) return;
+
+    // Eliminar fila vacía si existe
+    const emptyRow = tbody.querySelector('.empty-row');
+    if (emptyRow) {
+        emptyRow.remove();
+    }
+
+    const isSuper = (user.role === 'superadmin');
+    const roleClass = isSuper ? 'role-super' : 'role-standard';
+    const isActive = (user.status === 1 || user.status === '1');
+    const statusClass = isActive ? 'status-active' : 'status-inactive';
+    const statusText = isActive ? '● ACTIVO' : '■ INACTIVO';
+    const idFormatted = '#' + String(user.id || '+').padStart(2, '0');
+
+    const newTr = document.createElement('tr');
+    newTr.className = 'user-row-item row-highlight-new';
+    newTr.innerHTML = `
+        <td class="col-id">
+            <span class="id-badge">${escapeHtml(idFormatted)}</span>
+        </td>
+        <td class="col-name">
+            <span class="user-name-text">${escapeHtml(user.name)}</span>
+        </td>
+        <td class="col-email">
+            <span class="user-email-text">${escapeHtml(user.email)}</span>
+        </td>
+        <td class="col-role">
+            <div class="roles-tag-group">
+                <span class="role-pill ${roleClass}">
+                    [ ${escapeHtml(user.role)} ]
+                </span>
+            </div>
+        </td>
+        <td class="col-status">
+            <span class="status-pill ${statusClass}">
+                ${statusText}
+            </span>
+        </td>
+        <td class="col-created">
+            <span class="date-text">${escapeHtml(user.created_at || 'Justo ahora')}</span>
+        </td>
+    `;
+
+    tbody.prepend(newTr);
+
+    setTimeout(() => {
+        newTr.classList.remove('row-highlight-new');
+    }, 3000);
 }

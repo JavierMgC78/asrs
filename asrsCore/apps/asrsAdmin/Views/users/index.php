@@ -4,6 +4,12 @@ use asrsCore\Core\Conection;
 
 // Control de acceso y carga perimetral para superadmin
 $adminController = new AdminController();
+
+// Si la petición hacia esta vista es POST, delegar al endpoint de aprovisionamiento
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
+    $adminController->storeUser();
+}
+
 $viewData = $adminController->usersIndex();
 $currentUser = $viewData['currentUser'] ?? null;
 
@@ -40,6 +46,12 @@ try {
             <span class="security-indicator active"></span>
             <span class="security-label">[ CONTROL EXCLUSIVO: SUPERADMIN ]</span>
         </div>
+    </div>
+
+    <!-- Banner de notificación interactiva tipo consola -->
+    <div id="users-console-alert" class="console-alert-banner success" style="display: none;">
+        <span id="users-console-alert-icon" class="console-icon">[OK]</span>
+        <span id="users-console-alert-msg" class="console-msg"></span>
     </div>
 
     <!-- 2. Grid de las 4 Tarjetas Wireframe / Monospaced (Alineadas en una sola fila) -->
@@ -1154,9 +1166,37 @@ try {
     color: var(--bg-dark) !important;
     box-shadow: 0 0 15px rgba(0, 240, 255, 0.5) !important;
 }
+
+/* Banner de notificación interactiva tipo consola en página principal */
+.console-alert-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem 1.25rem;
+    border: 1px solid var(--neon-cyan);
+    background: rgba(0, 240, 255, 0.05);
+    color: var(--neon-cyan);
+    font-size: 0.85rem;
+    letter-spacing: 0.8px;
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+    animation: fadeInModal 0.25s ease-out;
+}
+
+.console-alert-banner .console-icon {
+    font-weight: bold;
+}
+
+.row-highlight-new {
+    animation: highlightRowCyan 3s ease-out;
+}
+
+@keyframes highlightRowCyan {
+    0% { background: rgba(0, 240, 255, 0.3); }
+    100% { background: transparent; }
+}
 </style>
 
-<!-- Lógica de Interacción JavaScript (Despliegue dinámico, modal USR-02 y filtro) -->
+<!-- Lógica de Interacción JavaScript (Despliegue dinámico, modal USR-02, Fetch asíncrono y filtro) -->
 <script>
 /* Funciones globales de apertura y cierre del modal de aprovisionamiento */
 function openCreateUserModal() {
@@ -1183,24 +1223,206 @@ function closeCreateUserModal() {
     }
 }
 
-function handleUserFormSubmit(event) {
-    event.preventDefault();
-    const alertBanner = document.getElementById('modal-user-alert-banner');
-    const name = document.getElementById('user-input-name')?.value.trim();
-    const email = document.getElementById('user-input-email')?.value.trim();
-    const role = document.getElementById('user-input-role')?.value;
+function showConsoleBanner(msg) {
+    const alertBox = document.getElementById('users-console-alert');
+    const alertMsg = document.getElementById('users-console-alert-msg');
+    const alertIcon = document.getElementById('users-console-alert-icon');
+    if (alertBox && alertMsg) {
+        alertBox.className = 'console-alert-banner success';
+        if (alertIcon) alertIcon.textContent = '[OK]';
+        alertMsg.textContent = msg;
+        alertBox.style.display = 'flex';
+        setTimeout(() => {
+            alertBox.style.display = 'none';
+        }, 5500);
+    }
+}
 
-    if (alertBanner) {
-        alertBanner.className = 'modal-alert success';
-        alertBanner.style.display = 'block';
-        alertBanner.innerHTML = `<strong>[✓ IDENTIDAD CAPTURADA]:</strong> Usuario <strong>${name}</strong> (${email}) con rol <strong>${role}</strong> listo para inserción en fase transaccional.`;
+/**
+ * Inserta un nuevo usuario al inicio de la tabla del catálogo con animación wireframe.
+ */
+function insertUserTableRow(user) {
+    if (!user) return;
+    const tbody = document.getElementById('users-table-body');
+    if (!tbody) return;
+
+    // Quitar mensaje de tabla vacía si existe
+    const emptyRow = tbody.querySelector('.empty-row');
+    if (emptyRow) {
+        emptyRow.remove();
     }
 
+    const isSuper = (user.role === 'superadmin');
+    const roleClass = isSuper ? 'role-super' : 'role-standard';
+    const isActive = (user.status === 1 || user.status === '1');
+    const statusClass = isActive ? 'status-active' : 'status-inactive';
+    const statusText = isActive ? '● ACTIVO' : '■ INACTIVO';
+    const idFormatted = '#' + String(user.id || '+').padStart(2, '0');
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    const newTr = document.createElement('tr');
+    newTr.className = 'user-row-item row-highlight-new';
+    newTr.innerHTML = `
+        <td class="col-id">
+            <span class="id-badge">${escapeHtml(idFormatted)}</span>
+        </td>
+        <td class="col-name">
+            <span class="user-name-text">${escapeHtml(user.name)}</span>
+        </td>
+        <td class="col-email">
+            <span class="user-email-text">${escapeHtml(user.email)}</span>
+        </td>
+        <td class="col-role">
+            <div class="roles-tag-group">
+                <span class="role-pill ${roleClass}">
+                    [ ${escapeHtml(user.role)} ]
+                </span>
+            </div>
+        </td>
+        <td class="col-status">
+            <span class="status-pill ${statusClass}">
+                ${statusText}
+            </span>
+        </td>
+        <td class="col-created">
+            <span class="date-text">${escapeHtml(user.created_at || 'Justo ahora')}</span>
+        </td>
+    `;
+
+    tbody.prepend(newTr);
+
     setTimeout(() => {
-        closeCreateUserModal();
-        const form = document.getElementById('form-create-user');
-        if (form) form.reset();
-    }, 2200);
+        newTr.classList.remove('row-highlight-new');
+    }, 3000);
+}
+
+/**
+ * Envío asíncrono del formulario mediante Fetch para aprovisionar un nuevo usuario
+ * y actualizar la tabla en tiempo real sin recargar la página.
+ */
+async function handleUserFormSubmit(event) {
+    if (event) event.preventDefault();
+
+    const submitBtn = document.getElementById('btn-submit-user');
+    const alertBanner = document.getElementById('modal-user-alert-banner');
+
+    const name = document.getElementById('user-input-name')?.value.trim() || '';
+    const email = document.getElementById('user-input-email')?.value.trim() || '';
+    const role = document.getElementById('user-input-role')?.value || 'student';
+    const password = document.getElementById('user-input-password')?.value || '';
+
+    // Validaciones locales
+    if (!name || !email || !password) {
+        if (alertBanner) {
+            alertBanner.className = 'modal-alert error';
+            alertBanner.style.display = 'block';
+            alertBanner.textContent = '[!] Todos los campos obligatorios deben ser completados.';
+        }
+        return;
+    }
+
+    if (password.length < 6) {
+        if (alertBanner) {
+            alertBanner.className = 'modal-alert error';
+            alertBanner.style.display = 'block';
+            alertBanner.textContent = '[!] La contraseña debe contener al menos 6 caracteres.';
+        }
+        return;
+    }
+
+    // Estado visual de carga
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span class="btn-indicator">⚡</span> [ APROVISIONANDO... ]';
+    }
+
+    const payload = {
+        name: name,
+        email: email,
+        role: role,
+        password: password
+    };
+
+    const tokenB = sessionStorage.getItem('asrs_validator') || localStorage.getItem('asrs_token_b');
+    const headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    };
+    if (tokenB) headers['Authorization'] = `Bearer ${tokenB}`;
+
+    try {
+        const response = await fetch('admin/users', {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(payload),
+            credentials: 'same-origin'
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.ok) {
+            // 1. Cerrar el modal
+            closeCreateUserModal();
+
+            // 2. Limpiar el formulario
+            const form = document.getElementById('form-create-user');
+            if (form) form.reset();
+
+            // 3. Notificación tipo consola en la página principal
+            showConsoleBanner(`[OK] ${data.message || 'Usuario aprovisionado exitosamente.'}`);
+
+            // 4. Actualizar tabla en tiempo real sin recargar página
+            insertUserTableRow(data.user);
+
+            // 5. Actualizar contador de usuarios
+            if (data.usersCount !== undefined) {
+                const countBadges = document.querySelectorAll('.drawer-count-badge');
+                countBadges.forEach(badge => {
+                    badge.textContent = `[ ${data.usersCount} REGISTRO(S) ]`;
+                });
+            }
+
+            // 6. Abrir drawer de catálogo si está cerrado para visualizar el nuevo registro
+            const drawer = document.getElementById('users-catalog-drawer');
+            const btnToggle = document.getElementById('btn-toggle-users-catalog');
+            if (drawer && !drawer.classList.contains('open')) {
+                drawer.classList.add('open');
+                drawer.setAttribute('aria-hidden', 'false');
+                if (btnToggle) {
+                    btnToggle.setAttribute('aria-expanded', 'true');
+                    btnToggle.classList.add('is-open');
+                    const btnText = btnToggle.querySelector('.btn-catalog-text');
+                    if (btnText) btnText.textContent = '[ OCULTAR CATÁLOGO ▲ ]';
+                }
+            }
+        } else {
+            if (alertBanner) {
+                alertBanner.className = 'modal-alert error';
+                alertBanner.style.display = 'block';
+                alertBanner.textContent = `[ERROR] ${data.error || 'Fallo al aprovisionar el usuario.'}`;
+            }
+        }
+    } catch (error) {
+        if (alertBanner) {
+            alertBanner.className = 'modal-alert error';
+            alertBanner.style.display = 'block';
+            alertBanner.textContent = `[ERROR DE RED] No se pudo establecer conexión con el núcleo ASRS: ${error.message}`;
+        }
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = '[ GUARDAR ]';
+        }
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function () {
