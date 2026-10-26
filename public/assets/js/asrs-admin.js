@@ -4,10 +4,16 @@
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Escucha global para el botón de apertura del modal si está presente
+    // Escucha global para el botón de apertura del modal de rutas si está presente
     const btnOpenModal = document.getElementById('btn-open-create-modal');
     if (btnOpenModal) {
         btnOpenModal.addEventListener('click', openCreateRouteModal);
+    }
+
+    // Escucha para el botón de apertura del modal de aprovisionamiento de usuario (USR-02)
+    const btnOpenUserModal = document.getElementById('btn-open-create-user-modal');
+    if (btnOpenUserModal) {
+        btnOpenUserModal.addEventListener('click', openCreateUserModal);
     }
 
     // Escucha para el formulario de creación de ruta
@@ -18,13 +24,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Cierre con Escape o clic en el backdrop
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeCreateRouteModal();
+        if (e.key === 'Escape') {
+            closeCreateRouteModal();
+            closeCreateUserModal();
+        }
     });
 
     document.addEventListener('click', (e) => {
         const modal = document.getElementById('modal-create-route');
         if (modal && e.target === modal) {
             closeCreateRouteModal();
+        }
+        const modalUser = document.getElementById('modal-create-user');
+        if (modalUser && e.target === modalUser) {
+            closeCreateUserModal();
         }
     });
 });
@@ -295,4 +308,30 @@ function escapeHtml(str) {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
+}
+
+/* ==========================================================================
+   Gestor de Usuarios - Modal de Aprovisionamiento (USR-02)
+   Estética Neon Dark & Wireframe Outline UI
+   ========================================================================== */
+function openCreateUserModal() {
+    const modal = document.getElementById('modal-create-user');
+    if (modal) {
+        modal.style.display = 'flex';
+        modal.setAttribute('aria-hidden', 'false');
+
+        // Auto-focus en el primer campo
+        setTimeout(() => {
+            const nameInput = document.getElementById('user-input-name');
+            if (nameInput) nameInput.focus();
+        }, 100);
+    }
+}
+
+function closeCreateUserModal() {
+    const modal = document.getElementById('modal-create-user');
+    if (modal) {
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
+    }
 }
