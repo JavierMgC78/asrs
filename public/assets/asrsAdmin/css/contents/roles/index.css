@@ -1,0 +1,332 @@
+/* ==========================================================================
+   Gestor de Roles — Neon Dark & Wireframe (vista estática)
+   ========================================================================== */
+.asrs-roles-management-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+}
+
+.roles-view-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px dashed var(--border-wire);
+    padding-bottom: 1.25rem;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.roles-view-title {
+    font-size: 1.4rem;
+    color: var(--neon-cyan);
+    letter-spacing: 2px;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+    margin-bottom: 0.35rem;
+}
+
+.roles-view-subtitle {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.roles-security-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    border: 1px solid var(--border-wire);
+    background: rgba(0, 240, 255, 0.04);
+    padding: 0.45rem 0.85rem;
+    font-size: 0.78rem;
+    letter-spacing: 1px;
+}
+
+.roles-security-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--neon-cyan);
+    box-shadow: 0 0 8px var(--neon-cyan);
+}
+
+.roles-security-label {
+    color: var(--neon-cyan);
+    font-weight: bold;
+}
+
+/* Grid de 3 tarjetas */
+.roles-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.15rem;
+    align-items: stretch;
+}
+
+.role-action-card {
+    background-color: var(--panel-bg);
+    border: 1px solid var(--border-wire);
+    padding: 1.25rem 1.05rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1.1rem;
+    transition: all 0.25s ease;
+    min-width: 0;
+}
+
+.role-action-card.card-cyan { border-color: rgba(0, 240, 255, 0.35); }
+.role-action-card.card-cyan:hover { border-color: var(--neon-cyan); box-shadow: 0 0 15px rgba(0, 240, 255, 0.25); }
+.role-action-card.card-amber { border-color: rgba(255, 183, 3, 0.35); }
+.role-action-card.card-amber:hover { border-color: var(--neon-amber); box-shadow: 0 0 15px rgba(255, 183, 3, 0.25); }
+.role-action-card.card-red { border-color: rgba(255, 51, 102, 0.35); }
+.role-action-card.card-red:hover { border-color: var(--neon-red); box-shadow: 0 0 15px rgba(255, 51, 102, 0.25); }
+
+.roles-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+    padding-bottom: 0.55rem;
+    gap: 0.4rem;
+}
+
+.roles-card-code {
+    font-size: 0.72rem;
+    letter-spacing: 1px;
+    font-weight: bold;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.roles-card-status { font-size: 0.72rem; letter-spacing: 1px; font-weight: bold; white-space: nowrap; }
+.roles-card-status.active  { color: var(--neon-cyan);  text-shadow: 0 0 6px rgba(0, 240, 255, 0.5); }
+.roles-card-status.warning { color: var(--neon-amber); text-shadow: 0 0 6px rgba(255, 183, 3, 0.5); }
+.roles-card-status.danger  { color: var(--neon-red);   text-shadow: 0 0 6px rgba(255, 51, 102, 0.5); }
+
+.roles-card-content { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.roles-card-title { font-size: 1.05rem; font-weight: bold; letter-spacing: 0.8px; margin: 0; line-height: 1.3; }
+.card-cyan  .roles-card-title { color: var(--neon-cyan); }
+.card-amber .roles-card-title { color: var(--neon-amber); }
+.card-red   .roles-card-title { color: var(--neon-red); }
+
+.roles-card-description { font-size: 0.8rem; color: var(--text-muted); line-height: 1.45; margin: 0; }
+
+.roles-card-bottom {
+    border-top: 1px dashed rgba(255, 255, 255, 0.08);
+    padding-top: 0.75rem;
+}
+
+.roles-card-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.35rem;
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    flex-wrap: wrap;
+}
+
+.roles-meta-item {
+    background: rgba(0, 0, 0, 0.35);
+    padding: 0.2rem 0.35rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    white-space: nowrap;
+}
+
+/* Formularios */
+.roles-form { display: flex; flex-direction: column; gap: 0.8rem; }
+.roles-form-group { display: flex; flex-direction: column; gap: 0.3rem; }
+
+.roles-form-label { font-size: 0.72rem; font-weight: bold; letter-spacing: 1px; color: var(--text-main); }
+.roles-form-label .label-prefix { color: var(--neon-cyan); margin-right: 0.2rem; }
+.roles-form-label .required { color: var(--neon-red); }
+
+.roles-form-input {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border-wire);
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 0.82rem;
+    padding: 0.5rem 0.65rem;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+}
+
+.roles-form-input::placeholder { color: var(--text-muted); font-size: 0.76rem; }
+.roles-form-input:focus { border-color: var(--neon-cyan); box-shadow: 0 0 8px rgba(0, 240, 255, 0.25); }
+.card-amber .roles-form-input:focus { border-color: var(--neon-amber); box-shadow: 0 0 8px rgba(255, 183, 3, 0.25); }
+.card-red .roles-form-input:focus { border-color: var(--neon-red); box-shadow: 0 0 8px rgba(255, 51, 102, 0.25); }
+.roles-form-input:disabled { opacity: 0.5; cursor: not-allowed; }
+.roles-form-textarea { resize: vertical; min-height: 64px; }
+.roles-form-select { cursor: pointer; }
+.roles-form-select option { background: #0b0f19; color: var(--text-main); }
+.roles-mono { font-family: 'Courier New', monospace; }
+.roles-form-hint { font-size: 0.66rem; color: var(--text-muted); }
+
+/* Restricción y validación de vistas asignadas */
+.roles-restriction-notice {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    border: 1px dashed rgba(255, 51, 102, 0.55);
+    background: rgba(255, 51, 102, 0.06);
+    padding: 0.6rem 0.75rem;
+    font-size: 0.74rem;
+    line-height: 1.4;
+    color: var(--text-main);
+}
+
+.roles-restriction-notice .notice-tag { color: var(--neon-red); font-weight: bold; letter-spacing: 1px; }
+
+.roles-assigned-views {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(0, 0, 0, 0.35);
+    padding: 0.5rem 0.65rem;
+    font-size: 0.74rem;
+}
+
+.roles-assigned-views .assigned-label { color: var(--text-muted); letter-spacing: 1px; font-weight: bold; }
+.roles-assigned-views .assigned-value { color: var(--neon-amber); }
+
+/* Botones (estáticos) */
+.roles-btn-card {
+    width: 100%;
+    padding: 0.6rem 0.4rem;
+    background: transparent;
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-align: center;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-top: 0.25rem;
+}
+
+.roles-btn-card.btn-cyan  { color: var(--neon-cyan);  border-color: var(--neon-cyan);  background: rgba(0, 240, 255, 0.08); }
+.roles-btn-card.btn-amber { color: var(--neon-amber); border-color: var(--neon-amber); background: rgba(255, 183, 3, 0.08); }
+.roles-btn-card.btn-red   { color: var(--neon-red);   border-color: var(--neon-red);   background: rgba(255, 51, 102, 0.08); }
+.roles-btn-card.btn-cyan:hover  { background: var(--neon-cyan);  color: var(--bg-dark); box-shadow: 0 0 15px rgba(0, 240, 255, 0.5); }
+.roles-btn-card.btn-amber:hover { background: var(--neon-amber); color: var(--bg-dark); box-shadow: 0 0 15px rgba(255, 183, 3, 0.5); }
+.roles-btn-card.btn-red:hover   { background: var(--neon-red);   color: var(--bg-dark); box-shadow: 0 0 15px rgba(255, 51, 102, 0.5); }
+
+/* Panel de aviso */
+.roles-notice-panel {
+    border: 1px dashed var(--border-wire);
+    background: rgba(0, 0, 0, 0.3);
+    padding: 0.9rem 1.1rem;
+}
+
+.roles-notice-panel .notice-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; }
+.roles-notice-panel .notice-icon { color: var(--neon-amber); font-weight: bold; }
+.roles-notice-panel .notice-title { color: var(--neon-amber); font-size: 0.78rem; letter-spacing: 1.5px; font-weight: bold; }
+.roles-notice-panel .notice-body { font-size: 0.8rem; color: var(--text-muted); line-height: 1.5; margin: 0; }
+
+/* Contenedor desplegable: catálogo de roles */
+.roles-catalog-drawer {
+    border: 1px solid transparent;
+    background: var(--panel-bg);
+    display: flex;
+    flex-direction: column;
+    gap: 1.15rem;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    padding: 0 1.25rem;
+    transform: translateY(-8px);
+    transition: max-height 0.45s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease, transform 0.35s ease, padding 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.roles-catalog-drawer.open {
+    max-height: 1400px;
+    opacity: 1;
+    transform: translateY(0);
+    padding: 1.4rem;
+    border-color: var(--border-wire);
+    box-shadow: 0 0 25px rgba(0, 240, 255, 0.12);
+}
+
+.roles-drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    border-bottom: 1px dashed var(--border-wire);
+    padding-bottom: 0.9rem;
+}
+
+.roles-drawer-title { font-size: 1.05rem; color: var(--neon-cyan); font-weight: bold; letter-spacing: 1.5px; margin: 0; }
+.roles-drawer-controls { display: flex; align-items: center; gap: 0.85rem; }
+
+.roles-drawer-count {
+    font-size: 0.75rem;
+    color: var(--neon-amber);
+    border: 1px solid rgba(255, 183, 3, 0.4);
+    background: rgba(255, 183, 3, 0.08);
+    padding: 0.2rem 0.55rem;
+    letter-spacing: 1px;
+}
+
+.roles-btn-drawer-close {
+    background: transparent;
+    color: var(--neon-red);
+    border: 1px solid rgba(255, 51, 102, 0.5);
+    padding: 0.4rem 0.85rem;
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.roles-btn-drawer-close:hover { background: var(--neon-red); color: var(--bg-dark); box-shadow: 0 0 10px rgba(255, 51, 102, 0.6); }
+
+.roles-btn-card.is-open { color: var(--neon-amber); border-color: var(--neon-amber); background: rgba(255, 183, 3, 0.15); }
+
+.roles-table-wrapper { overflow-x: auto; border: 1px solid rgba(0, 240, 255, 0.15); background: rgba(0, 0, 0, 0.25); }
+.roles-wireframe-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; text-align: left; }
+
+.roles-wireframe-table thead th {
+    background-color: #0b0f19;
+    color: var(--neon-cyan);
+    padding: 0.8rem 1rem;
+    letter-spacing: 1.2px;
+    border-bottom: 2px solid var(--border-wire);
+    white-space: nowrap;
+}
+
+.roles-wireframe-table tbody td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+    color: var(--text-main);
+    vertical-align: middle;
+}
+
+.roles-wireframe-table tbody tr:hover { background: rgba(0, 240, 255, 0.04); }
+.roles-id-badge { color: var(--neon-cyan); font-weight: bold; }
+.roles-desc-cell { color: var(--text-muted); max-width: 320px; }
+.roles-empty { text-align: center; color: var(--text-muted); padding: 1.5rem; }
+.roles-views-badge { color: var(--neon-amber); border: 1px solid rgba(255, 183, 3, 0.4); padding: 0.1rem 0.5rem; font-weight: bold; }
+.roles-status-pill { font-size: 0.74rem; font-weight: bold; letter-spacing: 1px; }
+.roles-status-pill.is-active { color: var(--neon-cyan); }
+.roles-status-pill.is-inactive { color: var(--neon-red); }
+
+@media (max-width: 1400px) {
+
+    .roles-cards-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 1100px) {
+    .roles-cards-grid { grid-template-columns: 1fr; }
+}

@@ -95,5 +95,25 @@ return array (
     array (
       0 => 'superadmin',
     ),
+    'asrsAdmin|admin/routes' => 
+    array (
+      0 => 'superadmin',
+    ),
+    'asrsAdmin|asrsadmin/routes' => 
+    array (
+      0 => 'superadmin',
+    ),
+    'asrsAdmin|admin/users' => 
+    array (
+      0 => 'superadmin',
+    ),
+    'asrsAdmin|asrsadmin/users' => 
+    array (
+      0 => 'superadmin',
+    ),
+    'asrsAdmin|admin/roles' => 
+    array (
+      0 => 'superadmin',
+    ),
   ),
 );

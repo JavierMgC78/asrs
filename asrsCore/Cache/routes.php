@@ -335,5 +335,21 @@ return array (
     'css_path_view' => NULL,
     'js_path_view' => NULL,
   ),
+  'asrsAdmin|admin/roles' => 
+  array (
+    'uri' => 'admin/roles',
+    'app' => 'asrsAdmin',
+    'type' => 'private',
+    'controller' => 'AdminController',
+    'method' => 'rolesIndex',
+    'layout' => 'default',
+    'content' => 'roles/index',
+    'roles' => 
+    array (
+      0 => 'superadmin',
+    ),
+    'css_path_view' => NULL,
+    'js_path_view' => NULL,
+  ),
   '@default_app' => 'LaGuitarraDeLolo',
 );
