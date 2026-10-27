@@ -6,6 +6,10 @@ $adminController = new AdminController();
 
 // Si la petición es POST (alta de rol vía Fetch), delegar al endpoint de guardado
 if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
+    $postBody = json_decode((string)file_get_contents('php://input'), true);
+    if (is_array($postBody) && ($postBody['action'] ?? '') === 'update') {
+        $adminController->updateRole();
+    }
     $adminController->storeRole();
 }
 
@@ -128,6 +132,13 @@ try {
                         <label for="role-edit-select" class="roles-form-label"><span class="label-prefix">&gt;</span> ROL A MODIFICAR <span class="required">*</span></label>
                         <select id="role-edit-select" name="role_id" class="roles-form-input roles-form-select">
                             <option value="" selected>-- Seleccione un rol --</option>
+                            <?php foreach ($rolesList as $ro): ?>
+                                <option value="<?= (int)$ro['id'] ?>"
+                                    data-name="<?= htmlspecialchars((string)($ro['name'] ?? ''), ENT_QUOTES) ?>"
+                                    data-display="<?= htmlspecialchars((string)($ro['display_name'] ?? ''), ENT_QUOTES) ?>"
+                                    data-description="<?= htmlspecialchars((string)($ro['description'] ?? ''), ENT_QUOTES) ?>"
+                                    data-status="<?= (int)($ro['status'] ?? 1) ?>"><?= htmlspecialchars((string)($ro['name'] ?? '')) ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="roles-form-group">
@@ -149,7 +160,8 @@ try {
                             <option value="0">■ INACTIVO</option>
                         </select>
                     </div>
-                    <button type="button" id="btn-role-edit" class="roles-btn-card btn-amber" data-static="true">[ ACTUALIZAR ROL ]</button>
+                    <div id="role-edit-feedback" class="roles-form-hint" role="status" aria-live="polite"></div>
+                    <button type="submit" id="btn-role-edit" class="roles-btn-card btn-amber" disabled>[ ACTUALIZAR ROL ]</button>
                 </form>
             </div>
             <div class="roles-card-bottom">
@@ -223,7 +235,7 @@ try {
                     <?php if (empty($rolesList)): ?>
                         <tr><td colspan="6" class="roles-empty">[ NO SE ENCONTRARON ROLES REGISTRADOS ]</td></tr>
                     <?php else: foreach ($rolesList as $r): $active = ((int)($r['status'] ?? 1)) === 1; ?>
-                        <tr>
+                        <tr data-role-id="<?= (int)$r['id'] ?>">
                             <td><span class="roles-id-badge">#<?= str_pad((string)$r['id'], 2, '0', STR_PAD_LEFT) ?></span></td>
                             <td class="roles-mono"><?= htmlspecialchars((string)($r['name'] ?? '')) ?></td>
                             <td><?= htmlspecialchars((string)($r['display_name'] ?? '')) ?></td>

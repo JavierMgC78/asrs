@@ -565,6 +565,91 @@ class AdminController
         }
     }
 
+    /**
+     * Endpoint POST para modificar un rol existente y recompilar la caché roles.php.
+     * El identificador interno (name) no se modifica para preservar las referencias ACL en asrs_views.
+     * Acceso exclusivo para superadministradores.
+     */
+    public function updateRole(): never
+    {
+        if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+            $this->json(['ok' => false, 'error' => 'Método no permitido'], 405);
+        }
+
+        $user = Security::authenticate();
+        if ($user === null || !in_array(Security::ADMIN_ROLE, (array)($user['roles'] ?? []), true)) {
+            $this->json(['ok' => false, 'error' => Security::DENIED_MESSAGE], 403);
+        }
+
+        $input = [];
+        $raw = file_get_contents('php://input');
+        if (!empty($raw)) {
+            $decodedJson = json_decode($raw, true);
+            if (is_array($decodedJson)) {
+                $input = $decodedJson;
+            }
+        }
+        if (empty($input)) {
+            $input = $_POST;
+        }
+
+        $roleId      = (int)($input['role_id'] ?? 0);
+        $displayName = trim((string)($input['display_name'] ?? ''));
+        $description = trim((string)($input['description'] ?? ''));
+        $status      = ((string)($input['status'] ?? '1') === '0') ? 0 : 1;
+
+        if ($roleId <= 0) {
+            $this->json(['ok' => false, 'error' => 'Debe seleccionar un rol a modificar'], 422);
+        }
+        if ($displayName === '' || mb_strlen($displayName) > 100) {
+            $this->json(['ok' => false, 'error' => 'El nombre a mostrar es obligatorio (máx. 100 caracteres)'], 422);
+        }
+
+        try {
+            $pdo = Conection::getInstance();
+
+            $stmtRole = $pdo->prepare("SELECT id, name FROM roles WHERE id = :id LIMIT 1");
+            $stmtRole->execute([':id' => $roleId]);
+            $role = $stmtRole->fetch(PDO::FETCH_ASSOC);
+            if (!$role) {
+                $this->json(['ok' => false, 'error' => 'El rol seleccionado no existe'], 404);
+            }
+            if ($role['name'] === Security::ADMIN_ROLE && $status === 0) {
+                $this->json(['ok' => false, 'error' => 'El rol superadmin no puede desactivarse'], 422);
+            }
+
+            $stmt = $pdo->prepare(
+                "UPDATE roles SET display_name = :display_name, description = :description, status = :status WHERE id = :id"
+            );
+            $stmt->execute([
+                ':display_name' => $displayName,
+                ':description'  => $description !== '' ? $description : null,
+                ':status'       => $status,
+                ':id'           => $roleId,
+            ]);
+
+            // Recompilación inmediata del artefacto físico roles.php
+            $cacheFile = CacheRolesBuilder::DEFAULT_CACHE_FILE;
+            @unlink($cacheFile);
+            $cacheOk = CacheRolesBuilder::buildIfNotExists($cacheFile);
+
+            $this->json([
+                'ok'      => true,
+                'message' => "Rol '{$role['name']}' actualizado y caché recompilada.",
+                'role'    => [
+                    'id'           => $roleId,
+                    'name'         => $role['name'],
+                    'display_name' => $displayName,
+                    'description'  => $description,
+                    'status'       => $status,
+                ],
+                'cacheOk' => $cacheOk,
+            ]);
+        } catch (Throwable $e) {
+            $this->json(['ok' => false, 'error' => 'Fallo al actualizar el rol: ' . $e->getMessage()], 500);
+        }
+    }
+
     private function json(array $data, int $status = 200): never
     {
         http_response_code($status);
