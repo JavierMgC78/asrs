@@ -488,6 +488,83 @@ class AdminController
         return $payload;
     }
 
+    /**
+     * Endpoint POST para registrar un nuevo rol en la tabla roles.
+     * Acceso exclusivo para superadministradores.
+     */
+    public function storeRole(): never
+    {
+        if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+            $this->json(['ok' => false, 'error' => 'Método no permitido'], 405);
+        }
+
+        $user = Security::authenticate();
+        if ($user === null || !in_array(Security::ADMIN_ROLE, (array)($user['roles'] ?? []), true)) {
+            $this->json(['ok' => false, 'error' => Security::DENIED_MESSAGE], 403);
+        }
+
+        $input = [];
+        $raw = file_get_contents('php://input');
+        if (!empty($raw)) {
+            $decodedJson = json_decode($raw, true);
+            if (is_array($decodedJson)) {
+                $input = $decodedJson;
+            }
+        }
+        if (empty($input)) {
+            $input = $_POST;
+        }
+
+        $name        = strtolower(trim((string)($input['name'] ?? '')));
+        $displayName = trim((string)($input['display_name'] ?? ''));
+        $description = trim((string)($input['description'] ?? ''));
+        $status      = ((string)($input['status'] ?? '1') === '0') ? 0 : 1;
+
+        if ($name === '' || !preg_match('/^[a-z0-9_]{2,50}$/', $name)) {
+            $this->json(['ok' => false, 'error' => 'El nombre es obligatorio (2-50 caracteres: minúsculas, números o guion bajo)'], 422);
+        }
+        if ($displayName === '' || mb_strlen($displayName) > 100) {
+            $this->json(['ok' => false, 'error' => 'El nombre a mostrar es obligatorio (máx. 100 caracteres)'], 422);
+        }
+
+        try {
+            $pdo = Conection::getInstance();
+
+            $check = $pdo->prepare("SELECT id FROM roles WHERE name = :name LIMIT 1");
+            $check->execute([':name' => $name]);
+            if ($check->fetch()) {
+                $this->json(['ok' => false, 'error' => "El rol '{$name}' ya existe"], 409);
+            }
+
+            $stmt = $pdo->prepare(
+                "INSERT INTO roles (name, display_name, description, status)
+                 VALUES (:name, :display_name, :description, :status)"
+            );
+            $stmt->execute([
+                ':name'         => $name,
+                ':display_name' => $displayName,
+                ':description'  => $description !== '' ? $description : null,
+                ':status'       => $status,
+            ]);
+
+            $this->json([
+                'ok'      => true,
+                'message' => "Rol '{$name}' creado exitosamente.",
+                'role'    => [
+                    'id'           => (int)$pdo->lastInsertId(),
+                    'name'         => $name,
+                    'display_name' => $displayName,
+                    'description'  => $description,
+                    'status'       => $status,
+                    'views_count'  => 0,
+                ],
+                'rolesCount' => (int)$pdo->query("SELECT COUNT(*) FROM roles")->fetchColumn(),
+            ], 201);
+        } catch (Throwable $e) {
+            $this->json(['ok' => false, 'error' => 'Fallo al persistir el rol: ' . $e->getMessage()], 500);
+        }
+    }
+
     private function json(array $data, int $status = 200): never
     {
         http_response_code($status);

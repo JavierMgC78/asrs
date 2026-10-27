@@ -3,6 +3,12 @@ use asrsCore\apps\asrsAdmin\Controllers\AdminController;
 
 // Control de acceso perimetral exclusivo para superadmin
 $adminController = new AdminController();
+
+// Si la petición es POST (alta de rol vía Fetch), delegar al endpoint de guardado
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
+    $adminController->storeRole();
+}
+
 $viewData = $adminController->rolesIndex();
 $currentUser = $viewData['currentUser'] ?? null;
 
@@ -56,7 +62,7 @@ try {
             <div class="roles-card-bottom">
                 <div class="roles-card-meta">
                     <span class="roles-meta-item">Modo: LECTURA</span>
-                    <span class="roles-meta-item">Roles: <?= count($rolesList) ?></span>
+                    <span class="roles-meta-item" id="roles-meta-count">Roles: <?= count($rolesList) ?></span>
                 </div>
                 <button type="button" id="btn-toggle-roles-catalog" class="roles-btn-card btn-cyan" aria-expanded="false" aria-controls="roles-catalog-drawer">
                     <span class="btn-catalog-text">[ CONSULTAR CATÁLOGO ]</span>
@@ -95,7 +101,8 @@ try {
                             <option value="0">■ INACTIVO</option>
                         </select>
                     </div>
-                    <button type="button" id="btn-role-create" class="roles-btn-card btn-cyan" data-static="true">[ GUARDAR ROL ]</button>
+                    <div id="role-create-feedback" class="roles-form-hint" role="status" aria-live="polite"></div>
+                    <button type="submit" id="btn-role-create" class="roles-btn-card btn-cyan">[ GUARDAR ROL ]</button>
                 </form>
             </div>
             <div class="roles-card-bottom">
@@ -196,7 +203,7 @@ try {
         <div class="roles-drawer-header">
             <h2 class="roles-drawer-title">[≡] CATÁLOGO DE ROLES // MATRIZ_ACL</h2>
             <div class="roles-drawer-controls">
-                <span class="roles-drawer-count">[ <?= count($rolesList) ?> REGISTRO(S) ]</span>
+                <span class="roles-drawer-count" id="roles-drawer-count">[ <?= count($rolesList) ?> REGISTRO(S) ]</span>
                 <button type="button" id="btn-close-roles-catalog" class="roles-btn-drawer-close">[ ✕ CERRAR ]</button>
             </div>
         </div>
@@ -212,7 +219,7 @@ try {
                         <th>VISTAS ASIGNADAS</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="roles-table-body">
                     <?php if (empty($rolesList)): ?>
                         <tr><td colspan="6" class="roles-empty">[ NO SE ENCONTRARON ROLES REGISTRADOS ]</td></tr>
                     <?php else: foreach ($rolesList as $r): $active = ((int)($r['status'] ?? 1)) === 1; ?>
