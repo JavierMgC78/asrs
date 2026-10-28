@@ -52,6 +52,7 @@
                             <a href="admin/users" class="nav-link sub-link <?= ($activeUri === 'admin/users' || $activeUri === 'asrsadmin/users') ? 'active' : '' ?>">&gt; Gestor de Usuarios</a>
                             <a href="admin/routes" class="nav-link sub-link <?= ($activeUri === 'admin/routes' || $activeUri === 'asrsadmin/routes') ? 'active' : '' ?>">&gt; Rutas & Caché</a>
                             <a href="admin/roles" class="nav-link sub-link <?= ($activeUri === 'admin/roles' || $activeUri === 'asrsadmin/roles') ? 'active' : '' ?>">&gt; Gestor de Roles</a>
+                            <a href="admin/apps" class="nav-link sub-link <?= ($activeUri === 'admin/apps' || $activeUri === 'asrsadmin/apps') ? 'active' : '' ?>">&gt; Gestor de Apps</a>
                         </div>
                     </div>
                     <?php endif; ?>

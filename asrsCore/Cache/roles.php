@@ -115,5 +115,9 @@ return array (
     array (
       0 => 'superadmin',
     ),
+    'asrsAdmin|admin/apps' => 
+    array (
+      0 => 'superadmin',
+    ),
   ),
 );

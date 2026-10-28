@@ -753,6 +753,129 @@ class AdminController
         }
     }
 
+    /**
+     * Control perimetral y listado para el Gestor de Apps.
+     * Acceso exclusivo para superadmin.
+     *
+     * @return array Usuario actual y listado de aplicaciones registradas.
+     */
+    public function appsIndex(): array
+    {
+        $user = Security::authenticate();
+        if ($user === null || !in_array(Security::ADMIN_ROLE, (array)($user['roles'] ?? []), true)) {
+            if (($_SERVER['HTTP_ACCEPT'] ?? '') === 'application/json' || (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest')) {
+                $this->json(['ok' => false, 'error' => Security::DENIED_MESSAGE], 403);
+            }
+            header('Location: ' . Security::url(Security::LOGIN_URI), true, 302);
+            exit;
+        }
+
+        $apps = [];
+        try {
+            $pdo  = Conection::getInstance();
+            $apps = $pdo->query(
+                "SELECT id, app_key, name, description, status, is_default, created_at FROM asrs_apps ORDER BY id ASC"
+            )->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Throwable $e) {
+            $apps = [];
+        }
+
+        $payload = [
+            'ok'          => true,
+            'currentUser' => $user,
+            'title'       => 'GESTOR DE APPS',
+            'apps'        => $apps,
+            'timestamp'   => time(),
+        ];
+
+        if (($_SERVER['HTTP_ACCEPT'] ?? '') === 'application/json') {
+            $this->json($payload);
+        }
+
+        return $payload;
+    }
+
+    /**
+     * Endpoint POST (Fetch) para establecer la aplicación predeterminada (is_default = 1).
+     * Solo una app puede ser la predeterminada y debe estar activa (status = 1).
+     * Recompila apps.php y routes.php (esta última contiene la clave @default_app).
+     * Acceso exclusivo para superadmin.
+     */
+    public function setDefaultApp(): never
+    {
+        if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+            $this->json(['ok' => false, 'error' => 'Método no permitido'], 405);
+        }
+
+        $user = Security::authenticate();
+        if ($user === null || !in_array(Security::ADMIN_ROLE, (array)($user['roles'] ?? []), true)) {
+            $this->json(['ok' => false, 'error' => Security::DENIED_MESSAGE], 403);
+        }
+
+        $input = [];
+        $raw = file_get_contents('php://input');
+        if (!empty($raw)) {
+            $decodedJson = json_decode($raw, true);
+            if (is_array($decodedJson)) {
+                $input = $decodedJson;
+            }
+        }
+        if (empty($input)) {
+            $input = $_POST;
+        }
+
+        $appId = (int)($input['app_id'] ?? 0);
+        if ($appId <= 0) {
+            $this->json(['ok' => false, 'error' => 'Identificador de aplicación inválido'], 422);
+        }
+
+        try {
+            $pdo = Conection::getInstance();
+
+            $find = $pdo->prepare("SELECT id, app_key, name, status FROM asrs_apps WHERE id = :id LIMIT 1");
+            $find->execute([':id' => $appId]);
+            $app = $find->fetch(PDO::FETCH_ASSOC);
+            if (!$app) {
+                $this->json(['ok' => false, 'error' => 'La aplicación no existe'], 404);
+            }
+            if ((int)$app['status'] !== 1) {
+                $this->json(['ok' => false, 'error' => "La aplicación '{$app['name']}' está inactiva y no puede ser la predeterminada"], 409);
+            }
+
+            $pdo->beginTransaction();
+            $pdo->exec("UPDATE asrs_apps SET is_default = 0 WHERE is_default <> 0");
+            $upd = $pdo->prepare("UPDATE asrs_apps SET is_default = 1 WHERE id = :id");
+            $upd->execute([':id' => $appId]);
+            $pdo->commit();
+
+            // Recompilación física de ambos artefactos (apps.php y routes.php con @default_app)
+            $appsFile   = __DIR__ . '/../../../Cache/apps.php';
+            $routesFile = CacheRoutesBuilder::DEFAULT_CACHE_FILE;
+            @unlink($appsFile);
+            @unlink($routesFile);
+            $cacheOk = CacheAppsBuilder::buildIfNotExists($appsFile)
+                && CacheRoutesBuilder::buildIfNotExists($routesFile);
+
+            $this->json([
+                'ok'        => true,
+                'success'   => true,
+                'message'   => "Aplicación '{$app['name']}' establecida como predeterminada y caché recompilada.",
+                'defaultId' => $appId,
+                'app'       => [
+                    'id'      => (int)$app['id'],
+                    'app_key' => $app['app_key'],
+                    'name'    => $app['name'],
+                ],
+                'cacheOk'   => $cacheOk,
+            ]);
+        } catch (Throwable $e) {
+            if (isset($pdo) && $pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            $this->json(['ok' => false, 'error' => 'Fallo al establecer la app predeterminada: ' . $e->getMessage()], 500);
+        }
+    }
+
     private function json(array $data, int $status = 200): never
     {
         http_response_code($status);
