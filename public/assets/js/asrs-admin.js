@@ -216,13 +216,24 @@ function showConsoleBanner(msg) {
     const alertMsg = document.getElementById('console-alert-msg');
     const alertIcon = document.getElementById('console-alert-icon');
     if (alertBox && alertMsg) {
+        if (alertBox._fadeTimer) {
+            clearTimeout(alertBox._fadeTimer);
+            alertBox._fadeTimer = null;
+        }
         alertBox.className = 'console-alert-banner success';
         if (alertIcon) alertIcon.textContent = '[OK]';
         alertMsg.textContent = msg;
+        alertBox.style.transition = 'opacity 0.5s ease-out';
+        alertBox.style.opacity = '1';
         alertBox.style.display = 'flex';
-        setTimeout(() => {
-            alertBox.style.display = 'none';
-        }, 5000);
+        alertBox._fadeTimer = setTimeout(() => {
+            alertBox.style.opacity = '0';
+            alertBox._fadeTimer = setTimeout(() => {
+                alertBox.style.display = 'none';
+                alertBox.style.opacity = '1';
+                alertBox._fadeTimer = null;
+            }, 500);
+        }, 4500);
     }
 }
 

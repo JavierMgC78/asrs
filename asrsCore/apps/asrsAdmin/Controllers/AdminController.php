@@ -547,11 +547,21 @@ class AdminController
                 ':status'       => $status,
             ]);
 
+            // ID real capturado inmediatamente tras el INSERT (antes de cualquier otra consulta)
+            $newId = (int)$pdo->lastInsertId();
+
+            // Recompilación inmediata del artefacto físico roles.php
+            $cacheFile = CacheRolesBuilder::DEFAULT_CACHE_FILE;
+            @unlink($cacheFile);
+            $cacheOk = CacheRolesBuilder::buildIfNotExists($cacheFile);
+
             $this->json([
-                'ok'      => true,
-                'message' => "Rol '{$name}' creado exitosamente.",
-                'role'    => [
-                    'id'           => (int)$pdo->lastInsertId(),
+                'ok'         => true,
+                'success'    => true,
+                'id'         => $newId,
+                'message'    => "Rol '{$name}' creado exitosamente y caché de roles recompilada.",
+                'role'       => [
+                    'id'           => $newId,
                     'name'         => $name,
                     'display_name' => $displayName,
                     'description'  => $description,
@@ -559,6 +569,7 @@ class AdminController
                     'views_count'  => 0,
                 ],
                 'rolesCount' => (int)$pdo->query("SELECT COUNT(*) FROM roles")->fetchColumn(),
+                'cacheOk'    => $cacheOk,
             ], 201);
         } catch (Throwable $e) {
             $this->json(['ok' => false, 'error' => 'Fallo al persistir el rol: ' . $e->getMessage()], 500);
@@ -647,6 +658,98 @@ class AdminController
             ]);
         } catch (Throwable $e) {
             $this->json(['ok' => false, 'error' => 'Fallo al actualizar el rol: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Endpoint POST para eliminar un rol y recompilar la caché roles.php.
+     * Se bloquea si el rol tiene vistas asignadas (asrs_views.roles) o usuarios vinculados (asrs_user_roles).
+     * Acceso exclusivo para superadministradores.
+     */
+    public function deleteRole(): never
+    {
+        if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+            $this->json(['ok' => false, 'error' => 'Método no permitido'], 405);
+        }
+
+        $user = Security::authenticate();
+        if ($user === null || !in_array(Security::ADMIN_ROLE, (array)($user['roles'] ?? []), true)) {
+            $this->json(['ok' => false, 'error' => Security::DENIED_MESSAGE], 403);
+        }
+
+        $input = [];
+        $raw = file_get_contents('php://input');
+        if (!empty($raw)) {
+            $decodedJson = json_decode($raw, true);
+            if (is_array($decodedJson)) {
+                $input = $decodedJson;
+            }
+        }
+        if (empty($input)) {
+            $input = $_POST;
+        }
+
+        $roleId = (int)($input['role_id'] ?? 0);
+        if ($roleId <= 0) {
+            $this->json(['ok' => false, 'error' => 'Debe seleccionar un rol a eliminar'], 422);
+        }
+
+        try {
+            $pdo = Conection::getInstance();
+
+            $stmtRole = $pdo->prepare("SELECT id, name FROM roles WHERE id = :id LIMIT 1");
+            $stmtRole->execute([':id' => $roleId]);
+            $role = $stmtRole->fetch(PDO::FETCH_ASSOC);
+            if (!$role) {
+                $this->json(['ok' => false, 'error' => 'El rol seleccionado no existe'], 404);
+            }
+            if ($role['name'] === Security::ADMIN_ROLE) {
+                $this->json(['ok' => false, 'error' => 'El rol superadmin no puede eliminarse'], 422);
+            }
+
+            // Restricción 1: vistas asignadas en la matriz ACL
+            $viewsCount = 0;
+            foreach ($pdo->query("SELECT roles FROM asrs_views WHERE roles IS NOT NULL")->fetchAll(PDO::FETCH_COLUMN) as $json) {
+                $decoded = json_decode((string)$json, true);
+                if (is_array($decoded) && in_array($role['name'], $decoded, true)) {
+                    $viewsCount++;
+                }
+            }
+            if ($viewsCount > 0) {
+                $this->json([
+                    'ok'    => false,
+                    'error' => "No se puede eliminar el rol '{$role['name']}': tiene {$viewsCount} vista(s) asignada(s). Retire primero sus asignaciones.",
+                ], 409);
+            }
+
+            // Restricción 2: usuarios vinculados al rol
+            $stmtUsers = $pdo->prepare("SELECT COUNT(*) FROM asrs_user_roles WHERE role_id = :id");
+            $stmtUsers->execute([':id' => $roleId]);
+            $usersCount = (int)$stmtUsers->fetchColumn();
+            if ($usersCount > 0) {
+                $this->json([
+                    'ok'    => false,
+                    'error' => "No se puede eliminar el rol '{$role['name']}': tiene {$usersCount} usuario(s) asignado(s).",
+                ], 409);
+            }
+
+            $stmt = $pdo->prepare("DELETE FROM roles WHERE id = :id");
+            $stmt->execute([':id' => $roleId]);
+
+            // Recompilación inmediata del artefacto físico roles.php
+            $cacheFile = CacheRolesBuilder::DEFAULT_CACHE_FILE;
+            @unlink($cacheFile);
+            $cacheOk = CacheRolesBuilder::buildIfNotExists($cacheFile);
+
+            $this->json([
+                'ok'         => true,
+                'message'    => "Rol '{$role['name']}' eliminado y caché recompilada.",
+                'roleId'     => $roleId,
+                'rolesCount' => (int)$pdo->query("SELECT COUNT(*) FROM roles")->fetchColumn(),
+                'cacheOk'    => $cacheOk,
+            ]);
+        } catch (Throwable $e) {
+            $this->json(['ok' => false, 'error' => 'Fallo al eliminar el rol: ' . $e->getMessage()], 500);
         }
     }
 

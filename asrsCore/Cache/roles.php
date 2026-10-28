@@ -37,13 +37,6 @@ return array (
       'display_name' => 'Estudiante',
       'description' => 'Acceso exclusivo al portal personal de consulta y servicios.',
     ),
-    'coordinacion_prim' => 
-    array (
-      'id' => 6,
-      'name' => 'coordinacion_prim',
-      'display_name' => 'Coordinación Primaria',
-      'description' => 'gestor de alumnos',
-    ),
   ),
   'views' => 
   array (

@@ -165,7 +165,14 @@
 .roles-form-select { cursor: pointer; }
 .roles-form-select option { background: #0b0f19; color: var(--text-main); }
 .roles-mono { font-family: 'Courier New', monospace; }
-.roles-form-hint { font-size: 0.66rem; color: var(--text-muted); }
+.roles-form-hint {
+    font-size: 0.66rem;
+    color: var(--text-muted);
+    transition: opacity 0.5s ease-out;
+}
+.roles-form-hint.fade-out {
+    opacity: 0;
+}
 
 /* Restricción y validación de vistas asignadas */
 .roles-restriction-notice {
@@ -330,3 +337,179 @@
 @media (max-width: 1100px) {
     .roles-cards-grid { grid-template-columns: 1fr; }
 }
+
+/* ==========================================================================
+   Estilos de Modal Flotante de Alta de Rol (Neon Dark & Wireframe)
+   ========================================================================== */
+.asrs-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(11, 15, 25, 0.88);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 1.5rem;
+    animation: fadeInModal 0.2s ease-out;
+}
+
+@keyframes fadeInModal {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.asrs-modal-container {
+    background-color: var(--panel-bg, #0b0f19);
+    border: 1px solid var(--neon-cyan, #00f0ff);
+    box-shadow: 0 0 25px rgba(0, 240, 255, 0.3), inset 0 0 15px rgba(0, 240, 255, 0.05);
+    width: 100%;
+    max-width: 650px;
+    display: flex;
+    flex-direction: column;
+    animation: slideDownModal 0.25s ease-out;
+}
+
+@keyframes slideDownModal {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border-wire, rgba(0, 240, 255, 0.2));
+    background: rgba(0, 240, 255, 0.03);
+}
+
+.modal-title-group {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.modal-icon {
+    color: var(--neon-cyan, #00f0ff);
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.modal-title {
+    font-size: 1rem;
+    color: var(--neon-cyan, #00f0ff);
+    letter-spacing: 1.5px;
+    font-weight: bold;
+    text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+    margin: 0;
+}
+
+.btn-modal-close {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--neon-red, #ff3366);
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    transition: all 0.2s;
+}
+
+.btn-modal-close:hover {
+    border-color: var(--neon-red, #ff3366);
+    background: rgba(255, 51, 102, 0.1);
+    box-shadow: 0 0 8px rgba(255, 51, 102, 0.4);
+}
+
+.modal-wireframe-info {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    background: rgba(0, 240, 255, 0.03);
+    border-bottom: 1px dashed rgba(0, 240, 255, 0.15);
+    padding: 0.65rem 1.25rem;
+    font-size: 0.75rem;
+    color: var(--text-muted, #8892b0);
+}
+
+.info-tag {
+    color: var(--neon-cyan, #00f0ff);
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.modal-alert {
+    margin: 1rem 1.25rem 0 1.25rem;
+    padding: 0.65rem 0.85rem;
+    font-size: 0.85rem;
+    border: 1px solid transparent;
+    letter-spacing: 0.5px;
+}
+
+.modal-alert.error {
+    border-color: var(--neon-red, #ff3366);
+    background: rgba(255, 51, 102, 0.1);
+    color: var(--neon-red, #ff3366);
+}
+
+.modal-alert.success {
+    border-color: var(--neon-cyan, #00f0ff);
+    background: rgba(0, 240, 255, 0.1);
+    color: var(--neon-cyan, #00f0ff);
+}
+
+.modal-body {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    max-height: 75vh;
+    overflow-y: auto;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+@media (max-width: 600px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    border-top: 1px dashed var(--border-wire, rgba(0, 240, 255, 0.2));
+    background: rgba(0, 240, 255, 0.02);
+}
+
+.roles-btn-ghost {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--text-muted, #8892b0);
+    padding: 0.65rem 1rem;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.8rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+}
+
+.roles-btn-ghost:hover {
+    border-color: var(--text-main, #ccd6f6);
+    color: var(--text-main, #ccd6f6);
+}
+
+.btn-provision-toggle {
+    cursor: pointer;
+}
+
