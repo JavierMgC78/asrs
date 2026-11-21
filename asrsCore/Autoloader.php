@@ -1,38 +1,41 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Asrs\Core;
 
-class Autoloader {
-    
+/**
+ * Cargador automático PSR-4 nativo para el núcleo (Asrs\Core) y las aplicaciones (Apps).
+ */
+class Autoloader
+{
     /**
      * Registra la función de carga automática en la pila de SPL.
      */
-    public static function register(): void {
-        spl_autoload_register(function ($class) {
-            // Definir el namespace raíz del núcleo y el prefijo base del proyecto
-            // Ejemplo de namespace: Asrs\Core\Database -> asrsCore/Database.php
-            // O mapear namespaces de aplicaciones: Apps\CeaWeb\Controllers\HomeController
-            
-            $prefix = 'Asrs\\';
-            $base_dir = __DIR__ . '/'; // Apunta a asrsCore/
+    public static function register(): void
+    {
+        $projectRoot = dirname(__DIR__);
 
-            // Verificar si la clase usa el prefijo del core
-            $len = strlen($prefix);
-            if (strncmp($prefix, $class, $len) !== 0) {
-                // Si no pertenece a Asrs\, se podría evaluar si pertenece a una app hija o retornar
+        $prefixes = [
+            'Asrs\\Core\\' => __DIR__ . DIRECTORY_SEPARATOR,
+            'Apps\\'       => $projectRoot . DIRECTORY_SEPARATOR . 'apps' . DIRECTORY_SEPARATOR,
+        ];
+
+        spl_autoload_register(static function (string $class) use ($prefixes): void {
+            foreach ($prefixes as $prefix => $baseDir) {
+                $len = strlen($prefix);
+                if (strncmp($prefix, $class, $len) !== 0) {
+                    continue;
+                }
+
+                $relativeClass = substr($class, $len);
+                $file = $baseDir . str_replace('\\', DIRECTORY_SEPARATOR, $relativeClass) . '.php';
+
+                if (is_file($file)) {
+                    require $file;
+                }
+
                 return;
-            }
-
-            // Obtener el nombre relativo de la clase eliminando el prefijo
-            $relative_class = substr($class, $len);
-
-            // Reemplazar losseparadores de espacio de nombres por barras diagonales de directorio,
-            // agregar la extensión .php
-            $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
-
-            // Si el archivo existe, cargarlo
-            if (file_exists($file)) {
-                require $file;
             }
         });
     }
