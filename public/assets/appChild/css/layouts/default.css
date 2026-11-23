@@ -1,0 +1,306 @@
+:root {
+  --cea-navy: #1a237e;
+  --cea-royal: #2962ff;
+  --cea-sky: #a7caf0;
+  --cea-amber: #ffb300;
+  --cea-crimson: #b71c1c;
+
+  --cea-bg: #ffffff;
+  --cea-surface: #f8faff;
+  --cea-ink: #131b2e;
+  --cea-muted: #4b5565;
+  --cea-border: #e3e8f0;
+
+  --cea-max-width: 1200px;
+  --cea-radius: 6px;
+  --cea-header-h: 72px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  line-height: 1.6;
+  -webkit-text-size-adjust: 100%;
+}
+
+body.cea-body {
+  margin: 0;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+  background-color: var(--cea-bg);
+  color: var(--cea-ink);
+}
+
+.cea-container {
+  width: 100%;
+  max-width: var(--cea-max-width);
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+
+/* Header Persistente */
+.cea-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: var(--cea-bg);
+  border-bottom: 1px solid var(--cea-border);
+  transition: box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.cea-header.is-scrolled {
+  box-shadow: 0 6px 24px rgba(26, 35, 126, 0.08);
+}
+
+.cea-header__inner {
+  min-height: var(--cea-header-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+}
+
+.cea-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: var(--cea-navy);
+}
+
+.cea-brand__logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  display: block;
+  flex-shrink: 0;
+}
+
+.cea-brand__crest {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 2px solid var(--cea-navy);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.cea-crest-ring--inner {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid var(--cea-royal);
+}
+
+.cea-brand__text {
+  display: flex;
+  flex-direction: column;
+}
+
+.cea-brand__name {
+  font-size: 0.98rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.cea-brand__motto {
+  font-size: 0.72rem;
+  color: var(--cea-muted);
+  line-height: 1.2;
+}
+
+/* Navegación */
+.cea-nav {
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+}
+
+.cea-nav__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 1.35rem;
+}
+
+.cea-nav__link {
+  text-decoration: none;
+  color: var(--cea-ink);
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding-block: 0.4rem;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
+  white-space: nowrap;
+}
+
+.cea-nav__link:hover,
+.cea-nav__link[aria-current="page"] {
+  color: var(--cea-royal);
+  border-bottom-color: var(--cea-royal);
+}
+
+.cea-nav__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.cea-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.5rem 0.95rem;
+  border-radius: var(--cea-radius);
+  border: 1px solid transparent;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  white-space: nowrap;
+}
+
+.cea-btn--ghost {
+  color: var(--cea-navy);
+  border-color: var(--cea-border);
+  background-color: transparent;
+}
+
+.cea-btn--ghost:hover {
+  border-color: var(--cea-navy);
+  background-color: var(--cea-surface);
+}
+
+.cea-btn--primary {
+  background-color: var(--cea-navy);
+  color: #ffffff;
+}
+
+.cea-btn--primary:hover {
+  background-color: var(--cea-royal);
+}
+
+/* Línea sutil de niveles (Preescolar / Primaria / Secundaria) */
+.cea-level-strip {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  height: 3px;
+}
+
+.cea-level-strip__seg--preescolar {
+  background-color: var(--cea-amber);
+}
+
+.cea-level-strip__seg--primaria {
+  background-color: var(--cea-royal);
+}
+
+.cea-level-strip__seg--secundaria {
+  background-color: var(--cea-crimson);
+}
+
+/* Botón móvil */
+.cea-menu-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 1px solid var(--cea-border);
+  border-radius: var(--cea-radius);
+  background: transparent;
+  cursor: pointer;
+}
+
+.cea-menu-toggle span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  margin-inline: auto;
+  background-color: var(--cea-navy);
+}
+
+/* Contenedor principal */
+.cea-main {
+  flex: 1 0 auto;
+  padding-block: 2.5rem;
+}
+
+/* Footer */
+.cea-footer {
+  background-color: var(--cea-navy);
+  color: #ffffff;
+  padding-block: 1.75rem;
+  border-top: 4px solid var(--cea-sky);
+}
+
+.cea-footer__grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.cea-footer__title {
+  margin: 0 0 0.2rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.cea-footer__text,
+.cea-footer__copy {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--cea-sky);
+}
+
+/* Responsive */
+@media (max-width: 960px) {
+  .cea-menu-toggle {
+    display: inline-flex;
+  }
+
+  .cea-nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+    background-color: var(--cea-bg);
+    border-bottom: 1px solid var(--cea-border);
+    padding: 1.25rem 1.5rem;
+    box-shadow: 0 12px 24px rgba(19, 27, 46, 0.08);
+  }
+
+  .cea-nav.is-open {
+    display: flex;
+  }
+
+  .cea-nav__list {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .cea-nav__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

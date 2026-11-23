@@ -148,7 +148,7 @@ class ViewsCacheManager
      */
     private function fetchActiveViews(): array
     {
-        $sql = 'SELECT id, uri, app, type, controller, method, layout, content, roles, css_path_view, js_path_view, status, created_at
+        $sql = 'SELECT id, uri, app, is_child, is_public, controller, method, layout, content_name, roles, css_path_view, js_path_view, status, created_at
                 FROM asrs_views
                 WHERE status = :status
                 ORDER BY id ASC';

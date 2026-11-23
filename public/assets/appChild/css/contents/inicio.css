@@ -1,0 +1,427 @@
+html {
+  scroll-behavior: smooth;
+}
+
+.cea-home {
+  display: flex;
+  flex-direction: column;
+  gap: 3.5rem;
+}
+
+.cea-section,
+.cea-hero {
+  scroll-margin-top: 90px;
+}
+
+.cea-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.cea-kicker {
+  margin: 0 0 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cea-royal, #2962ff);
+}
+
+.cea-section__head {
+  max-width: 740px;
+}
+
+.cea-section__title {
+  margin: 0 0 0.6rem;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.5rem, 2.6vw, 2.1rem);
+  line-height: 1.25;
+  color: var(--cea-navy, #1a237e);
+}
+
+.cea-section__lead {
+  margin: 0;
+  color: var(--cea-muted, #4b5565);
+  font-size: 1rem;
+}
+
+/* Botones de contenido */
+.cea-home-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 600;
+  padding: 0.75rem 1.35rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.cea-home-btn--primary {
+  background-color: var(--cea-royal, #2962ff);
+  color: #ffffff;
+}
+
+.cea-home-btn--primary:hover {
+  background-color: #1d4ed8;
+}
+
+.cea-home-btn--secondary {
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+.cea-home-btn--secondary:hover {
+  background-color: rgba(255, 255, 255, 0.22);
+}
+
+.cea-home-btn--full {
+  width: 100%;
+}
+
+/* Inicio / Hero */
+.cea-hero {
+  background:
+    linear-gradient(120deg, rgba(26, 35, 126, 0.94), rgba(19, 27, 46, 0.88)),
+    var(--cea-navy, #1a237e);
+  color: #ffffff;
+  border-radius: 8px;
+  padding: clamp(2.5rem, 6vw, 4.5rem) clamp(1.5rem, 4vw, 3.5rem);
+  border-bottom: 4px solid var(--cea-sky, #a7caf0);
+}
+
+.cea-hero__content {
+  max-width: 720px;
+}
+
+.cea-hero__eyebrow {
+  margin: 0 0 0.75rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cea-sky, #a7caf0);
+}
+
+.cea-hero__title {
+  margin: 0 0 1rem;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.85rem, 4vw, 2.9rem);
+  line-height: 1.18;
+}
+
+.cea-hero__subtitle {
+  margin: 0 0 1.75rem;
+  font-size: 1.05rem;
+  color: #e2e8f0;
+  max-width: 600px;
+}
+
+.cea-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+}
+
+/* Nosotros / ADN Institucional */
+.cea-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.cea-metric {
+  background-color: var(--cea-surface, #f8faff);
+  border: 1px solid var(--cea-border, #e3e8f0);
+  border-top: 3px solid var(--cea-navy, #1a237e);
+  border-radius: 6px;
+  padding: 1.35rem;
+}
+
+.cea-metric__value {
+  display: block;
+  font-size: clamp(1.65rem, 3vw, 2.25rem);
+  font-weight: 700;
+  color: var(--cea-navy, #1a237e);
+  line-height: 1.1;
+}
+
+.cea-metric__label {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.9rem;
+  color: var(--cea-muted, #4b5565);
+}
+
+.cea-mv-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+}
+
+.cea-mv-card {
+  background-color: #ffffff;
+  border: 1px solid var(--cea-border, #e3e8f0);
+  border-radius: 6px;
+  padding: 1.5rem;
+}
+
+.cea-mv-card h3 {
+  margin: 0 0 0.5rem;
+  color: var(--cea-navy, #1a237e);
+  font-size: 1.1rem;
+}
+
+.cea-mv-card p {
+  margin: 0;
+  color: var(--cea-muted, #4b5565);
+}
+
+/* Oferta Educativa / Niveles */
+.cea-levels__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.cea-level-card {
+  background-color: #ffffff;
+  border: 1px solid var(--cea-border, #e3e8f0);
+  border-top-width: 4px;
+  border-radius: 6px;
+  padding: 1.4rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.cea-level-card:hover,
+.cea-level-card.is-selected {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(19, 27, 46, 0.08);
+}
+
+.cea-level-card--amber {
+  border-top-color: var(--cea-amber, #ffb300);
+}
+
+.cea-level-card--amber:hover,
+.cea-level-card--amber.is-selected {
+  background-color: #fffdf5;
+}
+
+.cea-level-card--royal {
+  border-top-color: var(--cea-royal, #2962ff);
+}
+
+.cea-level-card--royal:hover,
+.cea-level-card--royal.is-selected {
+  background-color: #f5f8ff;
+}
+
+.cea-level-card--crimson {
+  border-top-color: var(--cea-crimson, #b71c1c);
+}
+
+.cea-level-card--crimson:hover,
+.cea-level-card--crimson.is-selected {
+  background-color: #fff7f7;
+}
+
+.cea-level-card__tag {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.45rem;
+  color: var(--cea-muted, #4b5565);
+}
+
+.cea-level-card__heading {
+  margin: 0 0 0.6rem;
+  font-size: 1.15rem;
+  color: var(--cea-navy, #1a237e);
+}
+
+.cea-level-card__summary,
+.cea-level-card__goal {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--cea-muted, #4b5565);
+}
+
+.cea-level-card__goal {
+  margin-top: 0.75rem;
+  color: var(--cea-ink, #131b2e);
+}
+
+.cea-level-detail {
+  background-color: var(--cea-surface, #f8faff);
+  border: 1px solid var(--cea-border, #e3e8f0);
+  border-left: 4px solid var(--cea-navy, #1a237e);
+  border-radius: 6px;
+  padding: 1.25rem 1.5rem;
+}
+
+.cea-level-detail h3 {
+  margin: 0 0 0.4rem;
+  font-size: 1.05rem;
+  color: var(--cea-navy, #1a237e);
+}
+
+.cea-level-detail p {
+  margin: 0;
+  color: var(--cea-muted, #4b5565);
+  font-size: 0.95rem;
+}
+
+/* Programa C.A.R.E. */
+.cea-care {
+  background-color: var(--cea-surface, #f8faff);
+  border: 1px solid var(--cea-border, #e3e8f0);
+  border-radius: 8px;
+  padding: clamp(1.5rem, 3.5vw, 2.5rem);
+}
+
+.cea-care__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.cea-care-card {
+  background-color: #ffffff;
+  border: 1px solid var(--cea-border, #e3e8f0);
+  border-radius: 6px;
+  padding: 1.35rem;
+}
+
+.cea-care-card h3 {
+  margin: 0 0 0.45rem;
+  font-size: 1.05rem;
+  color: var(--cea-navy, #1a237e);
+}
+
+.cea-care-card p {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--cea-muted, #4b5565);
+}
+
+/* Contacto y Admisiones */
+.cea-admissions__wrap {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+.cea-steps-list {
+  margin: 0 0 1.75rem;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  color: var(--cea-muted, #4b5565);
+}
+
+.cea-steps-list strong {
+  color: var(--cea-navy, #1a237e);
+}
+
+.cea-trust-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.cea-trust-box {
+  background-color: var(--cea-surface, #f8faff);
+  border: 1px solid var(--cea-border, #e3e8f0);
+  border-radius: 6px;
+  padding: 1.1rem;
+}
+
+.cea-trust-box h3 {
+  margin: 0 0 0.35rem;
+  font-size: 0.98rem;
+  color: var(--cea-navy, #1a237e);
+}
+
+.cea-trust-box p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--cea-muted, #4b5565);
+}
+
+.cea-form {
+  background-color: var(--cea-surface, #f8faff);
+  border: 1px solid var(--cea-border, #e3e8f0);
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.cea-form h3 {
+  margin: 0 0 0.3rem;
+  color: var(--cea-navy, #1a237e);
+}
+
+.cea-form__hint {
+  margin: 0 0 1.15rem;
+  font-size: 0.88rem;
+  color: var(--cea-muted, #4b5565);
+}
+
+.cea-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+}
+
+.cea-field label {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--cea-ink, #131b2e);
+}
+
+.cea-field input,
+.cea-field select {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.92rem;
+  font-family: inherit;
+  background-color: #ffffff;
+  color: var(--cea-ink, #131b2e);
+}
+
+.cea-field input:focus,
+.cea-field select:focus {
+  outline: 2px solid var(--cea-royal, #2962ff);
+  outline-offset: 1px;
+}
+
+.cea-form__status {
+  margin: 0.75rem 0 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--cea-navy, #1a237e);
+}
+
+@media (max-width: 900px) {
+  .cea-metrics,
+  .cea-levels__grid,
+  .cea-care__grid,
+  .cea-mv-grid,
+  .cea-admissions__wrap,
+  .cea-trust-row {
+    grid-template-columns: 1fr;
+  }
+}
