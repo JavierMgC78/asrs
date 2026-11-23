@@ -5,7 +5,8 @@ return [
     'APP_CHILD_NAME' => 'cea', // De aquí se deducen ceaWeb y ceaAdmin
 
     // Control operativo y de flujo
-    'APP_CHILD_IS_DEFAULT' => 1, // 1 = Entrada raíz va a ceaWeb | 0 = Entrada raíz va a asrsWeb
+    'APP_CHILD_IS_DEFAULT' => 1
+    , // 1 = Entrada raíz va a ceaWeb | 0 = Entrada raíz va a asrsWeb
     'MAINTENANCE_APP'      => 0, // 1 = Pausa la app hija y redirige a asrsWeb con aviso
     'MAINTENANCE_GLOBAL'   => 0, // 1 = Bloquea todo el ecosistema (prioridad máxima)
 

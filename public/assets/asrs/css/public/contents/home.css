@@ -1,0 +1,469 @@
+:root {
+  --asrs-bg: #101926;
+  --asrs-bg-elevated: #142030;
+  --asrs-panel: #0c131d;
+  --asrs-white: #ffffff;
+  --asrs-silver: #d4d9ed;
+  --asrs-muted: #8f9bb3;
+  --asrs-gold: #e3b331;
+  --asrs-crimson: #d92525;
+  --asrs-line: rgba(212, 217, 237, 0.18);
+  --asrs-line-strong: rgba(212, 217, 237, 0.35);
+}
+
+.asrs-home {
+  display: flex;
+  flex-direction: column;
+  gap: 3.25rem;
+  color: var(--asrs-silver);
+  font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+.asrs-home code {
+  font-family: "Cascadia Code", "Fira Code", Consolas, monospace;
+  font-size: 0.88em;
+  color: var(--asrs-gold);
+  background-color: rgba(227, 179, 49, 0.1);
+  border: 1px solid rgba(227, 179, 49, 0.25);
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+}
+
+/* Hero Wireframe */
+.asrs-hero {
+  background-color: var(--asrs-panel);
+  border: 1px solid var(--asrs-line-strong);
+  border-left: 3px solid var(--asrs-gold);
+  border-radius: 4px;
+  padding: clamp(1.75rem, 4vw, 3rem);
+  background-image:
+    linear-gradient(to right, rgba(212, 217, 237, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(212, 217, 237, 0.04) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.asrs-hero__grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 2rem;
+  align-items: center;
+}
+
+.asrs-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: "Cascadia Code", Consolas, monospace;
+  font-size: 0.76rem;
+  letter-spacing: 0.08em;
+  color: var(--asrs-gold);
+  border: 1px solid rgba(227, 179, 49, 0.4);
+  background-color: rgba(16, 25, 38, 0.85);
+  padding: 0.35rem 0.7rem;
+  border-radius: 3px;
+  margin-bottom: 1.1rem;
+}
+
+.asrs-badge__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--asrs-gold);
+  box-shadow: 0 0 8px var(--asrs-gold);
+}
+
+.asrs-hero__title {
+  margin: 0 0 1rem;
+  font-size: clamp(1.85rem, 3.6vw, 2.75rem);
+  line-height: 1.15;
+  font-weight: 700;
+  color: var(--asrs-white);
+  letter-spacing: -0.02em;
+}
+
+.asrs-hero__accent {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: clamp(1.05rem, 1.8vw, 1.3rem);
+  font-weight: 500;
+  color: var(--asrs-gold);
+}
+
+.asrs-hero__lead {
+  margin: 0 0 1.75rem;
+  font-size: 0.98rem;
+  line-height: 1.65;
+  color: var(--asrs-silver);
+  max-width: 620px;
+}
+
+.asrs-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+}
+
+/* Botones estilo Outline / Técnico */
+.asrs-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 0.7rem 1.25rem;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.asrs-btn--gold {
+  color: var(--asrs-gold);
+  border-color: var(--asrs-gold);
+  background-color: rgba(227, 179, 49, 0.1);
+}
+
+.asrs-btn--gold:hover {
+  background-color: var(--asrs-gold);
+  color: var(--asrs-bg);
+  box-shadow: 0 0 16px rgba(227, 179, 49, 0.35);
+}
+
+.asrs-btn--outline {
+  color: var(--asrs-white);
+  border-color: var(--asrs-line-strong);
+  background-color: rgba(16, 25, 38, 0.7);
+}
+
+.asrs-btn--outline:hover {
+  border-color: var(--asrs-white);
+  background-color: rgba(212, 217, 237, 0.08);
+}
+
+/* Terminal / Pipeline */
+.asrs-terminal {
+  background-color: rgba(16, 25, 38, 0.92);
+  border: 1px solid var(--asrs-line-strong);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.asrs-terminal__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid var(--asrs-line);
+  background-color: rgba(255, 255, 255, 0.02);
+  font-family: "Cascadia Code", Consolas, monospace;
+  font-size: 0.76rem;
+}
+
+.asrs-terminal__title {
+  color: var(--asrs-muted);
+}
+
+.asrs-terminal__status {
+  color: var(--asrs-gold);
+  border: 1px solid rgba(227, 179, 49, 0.45);
+  padding: 0.1rem 0.45rem;
+  border-radius: 3px;
+}
+
+.asrs-terminal__list {
+  list-style: none;
+  margin: 0;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.asrs-terminal__list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px dashed var(--asrs-line);
+}
+
+.asrs-terminal__list li:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.asrs-step-tag {
+  font-family: "Cascadia Code", Consolas, monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--asrs-crimson);
+  border: 1px solid rgba(217, 37, 37, 0.5);
+  padding: 0.15rem 0.4rem;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.asrs-terminal__list strong {
+  display: block;
+  font-size: 0.88rem;
+  color: var(--asrs-white);
+}
+
+.asrs-terminal__list p {
+  margin: 0.15rem 0 0;
+  font-size: 0.8rem;
+  color: var(--asrs-muted);
+}
+
+/* Secciones y Encabezados */
+.asrs-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  scroll-margin-top: 88px;
+}
+
+.asrs-kicker {
+  margin: 0 0 0.3rem;
+  font-family: "Cascadia Code", Consolas, monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  color: var(--asrs-gold);
+}
+
+.asrs-section__title {
+  margin: 0;
+  font-size: clamp(1.35rem, 2.4vw, 1.8rem);
+  color: var(--asrs-white);
+  font-weight: 700;
+}
+
+/* Tarjetas Wireframe */
+.asrs-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+.asrs-card {
+  background-color: var(--asrs-panel);
+  border: 1px solid var(--asrs-line);
+  border-top-width: 2px;
+  border-radius: 4px;
+  padding: 1.35rem;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.asrs-card:hover {
+  transform: translateY(-2px);
+}
+
+.asrs-card--gold {
+  border-top-color: var(--asrs-gold);
+}
+
+.asrs-card--gold:hover {
+  border-color: var(--asrs-gold);
+}
+
+.asrs-card--silver {
+  border-top-color: var(--asrs-silver);
+}
+
+.asrs-card--silver:hover {
+  border-color: var(--asrs-silver);
+}
+
+.asrs-card--crimson {
+  border-top-color: var(--asrs-crimson);
+}
+
+.asrs-card--crimson:hover {
+  border-color: var(--asrs-crimson);
+}
+
+.asrs-card__code {
+  display: inline-block;
+  font-family: "Cascadia Code", Consolas, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--asrs-muted);
+  margin-bottom: 0.5rem;
+}
+
+.asrs-card h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+  color: var(--asrs-white);
+}
+
+.asrs-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--asrs-silver);
+}
+
+/* Control Operativo */
+.asrs-ops-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 1.25rem;
+}
+
+.asrs-panel {
+  background-color: var(--asrs-panel);
+  border: 1px solid var(--asrs-line);
+  border-radius: 4px;
+  padding: 1.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.asrs-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--asrs-line);
+}
+
+.asrs-panel__head h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--asrs-white);
+}
+
+.asrs-chip {
+  font-family: "Cascadia Code", Consolas, monospace;
+  font-size: 0.72rem;
+  padding: 0.18rem 0.5rem;
+  border-radius: 3px;
+  border: 1px solid var(--asrs-line-strong);
+  color: var(--asrs-silver);
+}
+
+.asrs-chip--gold {
+  border-color: rgba(227, 179, 49, 0.5);
+  color: var(--asrs-gold);
+}
+
+.asrs-switches {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.65rem;
+}
+
+.asrs-switch-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+  padding: 0.7rem;
+  background-color: var(--asrs-bg);
+  border: 1px solid var(--asrs-line);
+  border-radius: 4px;
+  color: var(--asrs-silver);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.asrs-switch-btn span {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.asrs-switch-btn:hover {
+  border-color: var(--asrs-line-strong);
+}
+
+.asrs-switch-btn.is-active {
+  border-color: var(--asrs-gold);
+  background-color: rgba(227, 179, 49, 0.08);
+}
+
+.asrs-switch-btn[data-mode="global"].is-active {
+  border-color: var(--asrs-crimson);
+  background-color: rgba(217, 37, 37, 0.1);
+}
+
+.asrs-console-output {
+  background-color: var(--asrs-bg);
+  border: 1px solid var(--asrs-line);
+  border-left: 3px solid var(--asrs-gold);
+  border-radius: 4px;
+  padding: 0.85rem 1rem;
+  font-family: "Cascadia Code", Consolas, monospace;
+}
+
+.asrs-console-output.is-alert {
+  border-left-color: var(--asrs-crimson);
+}
+
+.asrs-console-output__label {
+  margin: 0 0 0.25rem;
+  font-size: 0.72rem;
+  color: var(--asrs-muted);
+}
+
+.asrs-console-output__text {
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--asrs-white);
+}
+
+/* Especificaciones */
+.asrs-specs {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.asrs-specs__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px dashed var(--asrs-line);
+  font-size: 0.86rem;
+}
+
+.asrs-specs__row:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.asrs-specs__row dt {
+  color: var(--asrs-muted);
+}
+
+.asrs-specs__row dd {
+  margin: 0;
+  color: var(--asrs-white);
+  text-align: right;
+  font-weight: 500;
+}
+
+@media (max-width: 960px) {
+  .asrs-hero__grid,
+  .asrs-cards-grid,
+  .asrs-ops-grid,
+  .asrs-switches {
+    grid-template-columns: 1fr;
+  }
+
+  .asrs-specs__row {
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .asrs-specs__row dd {
+    text-align: left;
+  }
+}

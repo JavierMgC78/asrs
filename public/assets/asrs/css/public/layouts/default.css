@@ -1,0 +1,292 @@
+:root {
+  --asrs-navy: #101926;
+  --asrs-navy-elevated: #152234;
+  --asrs-surface: #0b111a;
+  --asrs-white: #ffffff;
+  --asrs-silver: #d4d9ed;
+  --asrs-muted: #8c98b0;
+  --asrs-gold: #e3b331;
+  --asrs-crimson: #d92525;
+  --asrs-border: rgba(212, 217, 237, 0.16);
+  --asrs-border-strong: rgba(212, 217, 237, 0.32);
+  --asrs-header-h: 72px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body.asrs-layout-body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--asrs-navy);
+  color: var(--asrs-silver);
+  font-family: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+.asrs-skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 2000;
+  background-color: var(--asrs-gold);
+  color: var(--asrs-navy);
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 0.6rem 1rem;
+  text-decoration: none;
+  border-radius: 0 0 4px 0;
+}
+
+.asrs-skip-link:focus {
+  left: 0;
+}
+
+.asrs-container {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-inline: clamp(1rem, 3vw, 2rem);
+}
+
+/* Header Outline */
+.asrs-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  min-height: var(--asrs-header-h);
+  background-color: rgba(16, 25, 38, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--asrs-border-strong);
+}
+
+.asrs-header__inner {
+  width: 100%;
+  max-width: 1180px;
+  min-height: var(--asrs-header-h);
+  margin: 0 auto;
+  padding-inline: clamp(1rem, 3vw, 2rem);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.asrs-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: var(--asrs-white);
+}
+
+.asrs-brand__mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(227, 179, 49, 0.55);
+  border-radius: 4px;
+  background-color: var(--asrs-surface);
+  color: var(--asrs-gold);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.asrs-brand:hover .asrs-brand__mark {
+  border-color: var(--asrs-gold);
+  box-shadow: 0 0 12px rgba(227, 179, 49, 0.25);
+}
+
+.asrs-brand__text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.asrs-brand__text strong {
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  color: var(--asrs-white);
+}
+
+.asrs-brand__text small {
+  font-family: "Cascadia Code", Consolas, monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  color: var(--asrs-gold);
+}
+
+/* Navegación */
+.asrs-nav__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.asrs-nav__link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--asrs-silver);
+  padding: 0.45rem 0.8rem;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.asrs-nav__link:hover,
+.asrs-nav__link:focus-visible {
+  color: var(--asrs-white);
+  border-color: var(--asrs-border-strong);
+  background-color: rgba(212, 217, 237, 0.05);
+  outline: none;
+}
+
+.asrs-nav__link.is-active {
+  color: var(--asrs-gold);
+  border-color: rgba(227, 179, 49, 0.5);
+  background-color: rgba(227, 179, 49, 0.08);
+}
+
+/* Botón Menú Móvil */
+.asrs-nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  padding: 0 9px;
+  background-color: var(--asrs-surface);
+  border: 1px solid var(--asrs-border-strong);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.asrs-nav-toggle span {
+  display: block;
+  width: 100%;
+  height: 1.5px;
+  background-color: var(--asrs-silver);
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.asrs-nav-toggle[aria-expanded="true"] span:nth-child(1) {
+  transform: translateY(6.5px) rotate(45deg);
+  background-color: var(--asrs-gold);
+}
+
+.asrs-nav-toggle[aria-expanded="true"] span:nth-child(2) {
+  opacity: 0;
+}
+
+.asrs-nav-toggle[aria-expanded="true"] span:nth-child(3) {
+  transform: translateY(-6.5px) rotate(-45deg);
+  background-color: var(--asrs-gold);
+}
+
+/* Main */
+.asrs-main {
+  flex: 1 0 auto;
+  padding-block: clamp(1.75rem, 4vw, 3rem);
+}
+
+/* Footer Outline */
+.asrs-footer {
+  margin-top: auto;
+  background-color: var(--asrs-surface);
+  border-top: 1px solid var(--asrs-border);
+  padding-block: 1.25rem;
+}
+
+.asrs-footer__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.asrs-footer__tag {
+  display: inline-block;
+  font-family: "Cascadia Code", Consolas, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: var(--asrs-gold);
+  margin-bottom: 0.2rem;
+}
+
+.asrs-footer__meta p {
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--asrs-muted);
+}
+
+.asrs-footer__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: "Cascadia Code", Consolas, monospace;
+  font-size: 0.74rem;
+  color: var(--asrs-silver);
+  border: 1px solid var(--asrs-border);
+  padding: 0.3rem 0.65rem;
+  border-radius: 3px;
+}
+
+.asrs-status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--asrs-gold);
+  box-shadow: 0 0 7px var(--asrs-gold);
+}
+
+@media (max-width: 820px) {
+  .asrs-nav-toggle {
+    display: inline-flex;
+  }
+
+  .asrs-nav {
+    display: none;
+    position: absolute;
+    top: var(--asrs-header-h);
+    left: 0;
+    right: 0;
+    background-color: var(--asrs-surface);
+    border-bottom: 1px solid var(--asrs-border-strong);
+    padding: 0.85rem clamp(1rem, 3vw, 2rem) 1.15rem;
+  }
+
+  .asrs-nav.is-open {
+    display: block;
+  }
+
+  .asrs-nav__list {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.35rem;
+  }
+
+  .asrs-nav__link {
+    width: 100%;
+    padding: 0.65rem 0.85rem;
+  }
+}

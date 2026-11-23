@@ -70,13 +70,9 @@ class Router
             return null;
         }
 
-        // En la raíz '/', si la caché contuviera múltiples variantes o se requiriera
-        // validar el flag APP_CHILD_IS_DEFAULT, se respeta la configuración activa.
-        if ($uri === '/' && isset($this->config['APP_CHILD_IS_DEFAULT'], $route['is_child'])) {
-            $expectedChild = (int)$this->config['APP_CHILD_IS_DEFAULT'];
-            if ((int)$route['is_child'] !== $expectedChild) {
-                return $route;
-            }
+        // El contexto activo (appChild vs asrs) se determina según APP_CHILD_IS_DEFAULT
+        if (isset($this->config['APP_CHILD_IS_DEFAULT'])) {
+            $route['is_child'] = (int)$this->config['APP_CHILD_IS_DEFAULT'] === 1 ? 1 : 0;
         }
 
         return $route;

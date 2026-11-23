@@ -1,12 +1,57 @@
+<?php
+declare(strict_types=1);
+
+$projectRoot = realpath(__DIR__ . '/../../../../') ?: dirname(__DIR__, 4);
+$publicRoot = $projectRoot . DIRECTORY_SEPARATOR . 'public';
+$scopeFolder = 'public';
+
+$rawContentName = (string)($route['content_name'] ?? $route['content'] ?? $contentName ?? $content_name ?? $viewContent ?? '');
+if ($rawContentName === '' && !empty($contentViewPath)) {
+    $rawContentName = pathinfo((string)$contentViewPath, PATHINFO_FILENAME);
+}
+$safeContentName = basename(trim($rawContentName));
+if (str_ends_with(strtolower($safeContentName), '.php')) {
+    $safeContentName = substr($safeContentName, 0, -4);
+}
+$safeContentName = (string)preg_replace('/[^a-zA-Z0-9_-]/', '', $safeContentName);
+
+if (defined('APP_CHILD_IS_DEFAULT')) {
+    $appFolder = ((int)constant('APP_CHILD_IS_DEFAULT') === 1) ? 'appChild' : 'asrs';
+} else {
+    $cfgFile = $projectRoot . DIRECTORY_SEPARATOR . 'asrsCore' . DIRECTORY_SEPARATOR . 'config.php';
+    $cfg = is_file($cfgFile) ? (require $cfgFile) : [];
+    $appFolder = (is_array($cfg) && (int)($cfg['APP_CHILD_IS_DEFAULT'] ?? 0) === 1) ? 'appChild' : 'asrs';
+}
+
+$resolvedCssUrl = isset($contentCssUrl) && is_string($contentCssUrl) && $contentCssUrl !== '' ? $contentCssUrl : null;
+$resolvedJsUrl  = isset($contentJsUrl) && is_string($contentJsUrl) && $contentJsUrl !== '' ? $contentJsUrl : null;
+
+if ($safeContentName !== '') {
+    if ($resolvedCssUrl === null) {
+        $cssDisk = $publicRoot . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . $appFolder . DIRECTORY_SEPARATOR . 'css' . DIRECTORY_SEPARATOR . $scopeFolder . DIRECTORY_SEPARATOR . 'contents' . DIRECTORY_SEPARATOR . $safeContentName . '.css';
+        if (is_file($cssDisk)) {
+            $resolvedCssUrl = '/assets/' . $appFolder . '/css/' . $scopeFolder . '/contents/' . $safeContentName . '.css';
+        }
+    }
+    if ($resolvedJsUrl === null) {
+        $jsDisk = $publicRoot . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . $appFolder . DIRECTORY_SEPARATOR . 'js' . DIRECTORY_SEPARATOR . $scopeFolder . DIRECTORY_SEPARATOR . 'contents' . DIRECTORY_SEPARATOR . $safeContentName . '.js';
+        if (is_file($jsDisk)) {
+            $resolvedJsUrl = '/assets/' . $appFolder . '/js/' . $scopeFolder . '/contents/' . $safeContentName . '.js';
+        }
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><?= htmlspecialchars($pageTitle ?? 'Centro Educativo América | Educación, Formación, Desarrollo', ENT_QUOTES, 'UTF-8') ?></title>
-  <link rel="stylesheet" href="<?= htmlspecialchars($baseCss ?? '/assets/appChild/css/layouts/default.css', ENT_QUOTES, 'UTF-8') ?>">
-  <?php if (!empty($contentCss)): ?>
-    <link rel="stylesheet" href="<?= htmlspecialchars($contentCss, ENT_QUOTES, 'UTF-8') ?>">
+  
+  <link rel="stylesheet" href="<?= htmlspecialchars($baseCss ?? 'assets/appChild/css/public/layouts/default.css', ENT_QUOTES, 'UTF-8') ?>">
+  
+  <?php if ($resolvedCssUrl !== null): ?>
+    <link rel="stylesheet" href="<?= htmlspecialchars($resolvedCssUrl, ENT_QUOTES, 'UTF-8') ?>">
   <?php endif; ?>
 </head>
 <body class="cea-body" data-institution="CEA">
@@ -80,8 +125,8 @@
   </footer>
 
   <script src="<?= htmlspecialchars($baseJs ?? '/assets/appChild/js/cea-layout.js', ENT_QUOTES, 'UTF-8') ?>" defer></script>
-  <?php if (!empty($contentJs)): ?>
-    <script src="<?= htmlspecialchars($contentJs, ENT_QUOTES, 'UTF-8') ?>" defer></script>
+  <?php if ($resolvedJsUrl !== null): ?>
+    <script src="<?= htmlspecialchars($resolvedJsUrl, ENT_QUOTES, 'UTF-8') ?>" defer></script>
   <?php endif; ?>
 </body>
 </html>

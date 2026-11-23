@@ -3,17 +3,17 @@
 declare(strict_types=1);
 
 return array (
-  '/inicio' => 
+  '/home' => 
   array (
     'id' => 25,
-    'uri' => '/inicio',
+    'uri' => '/home',
     'app' => 'ceaWeb',
     'is_child' => 1,
     'is_public' => 1,
     'controller' => '',
     'method' => '',
     'layout' => 'default',
-    'content_name' => 'inicio',
+    'content_name' => 'home',
     'roles' => NULL,
     'css_path_view' => NULL,
     'js_path_view' => NULL,
@@ -30,7 +30,7 @@ return array (
     'controller' => '',
     'method' => '',
     'layout' => 'default',
-    'content_name' => 'inicio',
+    'content_name' => 'home',
     'roles' => NULL,
     'css_path_view' => NULL,
     'js_path_view' => NULL,

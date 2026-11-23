@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace Asrs\Core;
 
-use RuntimeException;
 use Throwable;
 
 /**
- * Encargada exclusivamente de resolver las rutas físicas de las vistas
- * y renderizar el contenido dentro del layout correspondiente.
+ * Encargada de resolver dinámicamente las rutas físicas de vistas y assets
+ * según APP_CHILD_IS_DEFAULT y el alcance (public/private), sin fallback cruzado entre ramas.
  */
 class LoadView
 {
@@ -25,49 +24,51 @@ class LoadView
     }
 
     /**
-     * Resuelve los archivos de contenido y layout de la ruta, captura el contenido
-     * con output buffering y renderiza el layout final.
+     * Resuelve y renderiza el contenido dentro del layout para la rama activa.
+     * Si el layout o el contenido no existen en la rama activa, responde con 404 controlado.
      *
-     * @param array<string, mixed> $route Registro de ruta proveniente de la caché.
+     * @param array<string, mixed> $route Registro de ruta resuelto por Router/Middleware.
      *
-     * @throws RuntimeException Si el nombre de archivo es inválido o no existen los archivos de vista.
-     * @throws Throwable        Si ocurre un error durante la ejecución de la plantilla.
+     * @throws Throwable Si ocurre un error durante la ejecución de la plantilla.
      */
     public function render(array $route): void
     {
-        $isChild = (int)($route['is_child'] ?? 0) === 1;
-        $isPublic = (int)($route['is_public'] ?? 0) === 1;
+        $appDir = $this->resolveAppDir();
+        $scope = ((int)($route['is_public'] ?? 1) === 1) ? 'public' : 'private';
 
-        $appDir = $this->resolveAppDir($isChild);
-        $scope = $isPublic ? 'public' : 'private';
+        $layoutName = $this->sanitizeName((string)($route['layout'] ?? 'default'));
+        $contentName = $this->sanitizeName((string)($route['content_name'] ?? $route['content'] ?? ''));
 
-        $layoutName = $this->sanitizeFileName((string)($route['layout'] ?? 'default'));
-        $rawContent = (string)($route['content_name'] ?? $route['content'] ?? '');
-        $contentName = $this->sanitizeFileName($rawContent);
+        if ($layoutName === '' || $contentName === '') {
+            $this->handleNotFound();
+            return;
+        }
 
         $viewsBase = $this->projectRoot
             . DIRECTORY_SEPARATOR . 'apps'
             . DIRECTORY_SEPARATOR . $appDir
-            . DIRECTORY_SEPARATOR . 'Views'
+            . DIRECTORY_SEPARATOR . 'views'
             . DIRECTORY_SEPARATOR . $scope;
 
-        $contentFile = $viewsBase . DIRECTORY_SEPARATOR . 'contents' . DIRECTORY_SEPARATOR . $contentName . '.php';
         $layoutFile = $viewsBase . DIRECTORY_SEPARATOR . 'layouts' . DIRECTORY_SEPARATOR . $layoutName . '.php';
+        $contentViewPath = $viewsBase . DIRECTORY_SEPARATOR . 'contents' . DIRECTORY_SEPARATOR . $contentName . '.php';
 
-        if (!is_file($contentFile)) {
-            throw new RuntimeException('El archivo de contenido de la vista no existe.');
+        if (!is_file($layoutFile) || !is_file($contentViewPath)) {
+            $this->handleNotFound();
+            return;
         }
 
-        if (!is_file($layoutFile)) {
-            throw new RuntimeException('El archivo de layout de la vista no existe.');
-        }
+        $contentCssUrl = $this->resolveAssetUrl($appDir, 'css', $scope, $contentName);
+        $contentJsUrl = $this->resolveAssetUrl($appDir, 'js', $scope, $contentName);
 
-        $contentCss = $this->resolveContentAsset($appDir, 'css', $contentName);
-        $contentJs = $this->resolveContentAsset($appDir, 'js', $contentName);
+        // Variables de compatibilidad para layouts existentes
+        $contentFile = $contentViewPath;
+        $contentCss = $contentCssUrl;
+        $contentJs = $contentJsUrl;
 
         ob_start();
         try {
-            require $contentFile;
+            require $contentViewPath;
             $content = (string)ob_get_clean();
         } catch (Throwable $e) {
             if (ob_get_level() > 0) {
@@ -80,70 +81,72 @@ class LoadView
     }
 
     /**
-     * Resuelve el directorio de la aplicación según el flag `is_child`.
+     * Evalúa dinámicamente en cada ejecución si la rama activa es `appChild` o `asrs`.
+     * No almacena ni fija la rama en memoria persistente.
      */
-    private function resolveAppDir(bool $isChild): string
+    private function resolveAppDir(): string
     {
-        if ($isChild) {
-            return 'appChild';
+        if (defined('APP_CHILD_IS_DEFAULT')) {
+            return ((int)constant('APP_CHILD_IS_DEFAULT') === 1) ? 'appChild' : 'asrs';
         }
 
-        $asrsViews = $this->projectRoot
-            . DIRECTORY_SEPARATOR . 'apps'
-            . DIRECTORY_SEPARATOR . 'asrs'
-            . DIRECTORY_SEPARATOR . 'Views';
-
-        if (is_dir($asrsViews)) {
-            return 'asrs';
+        $configFile = $this->projectRoot . DIRECTORY_SEPARATOR . 'asrsCore' . DIRECTORY_SEPARATOR . 'config.php';
+        if (is_file($configFile)) {
+            $config = require $configFile;
+            if (is_array($config) && isset($config['APP_CHILD_IS_DEFAULT'])) {
+                return ((int)$config['APP_CHILD_IS_DEFAULT'] === 1) ? 'appChild' : 'asrs';
+            }
         }
 
-        $asrsWebViews = $this->projectRoot
-            . DIRECTORY_SEPARATOR . 'apps'
-            . DIRECTORY_SEPARATOR . 'asrsWeb'
-            . DIRECTORY_SEPARATOR . 'Views';
-
-        return is_dir($asrsWebViews) ? 'asrsWeb' : 'asrs';
+        return 'asrs';
     }
 
     /**
-     * Sanitiza un nombre de archivo de vista usando basename() para evitar path traversal.
-     *
-     * @throws RuntimeException Si el nombre resultante está vacío o es inválido.
+     * Sanea nombres de layout y contenido con basename() y caracteres permitidos [a-zA-Z0-9_-].
      */
-    private function sanitizeFileName(string $name): string
+    private function sanitizeName(string $name): string
     {
         $clean = basename(trim($name));
         if (str_ends_with(strtolower($clean), '.php')) {
             $clean = substr($clean, 0, -4);
         }
 
-        if ($clean === '' || $clean === '.' || $clean === '..') {
-            throw new RuntimeException('Nombre de archivo de vista inválido.');
-        }
+        $sanitized = (string)preg_replace('/[^a-zA-Z0-9_-]/', '', $clean);
 
-        return $clean;
+        return $sanitized;
     }
 
     /**
-     * Infiere la ruta web del asset (css o js) a partir de `content_name`
-     * aplicando basename() y verificando su existencia física en public/assets/.
+     * Verifica en disco si existe el asset (css/js) para el contenido y alcance dados
+     * en `public/assets/{appDir}/{type}/{scope}/contents/{content_name}.{type}`.
      */
-    private function resolveContentAsset(string $appDir, string $type, string $contentName): ?string
+    private function resolveAssetUrl(string $appDir, string $type, string $scope, string $contentName): ?string
     {
-        $safeName = basename($contentName);
-        if ($safeName === '' || $safeName === '.' || $safeName === '..') {
-            return null;
-        }
-
-        $relativeWebPath = '/assets/' . $appDir . '/' . $type . '/contents/' . $safeName . '.' . $type;
         $diskPath = $this->projectRoot
             . DIRECTORY_SEPARATOR . 'public'
             . DIRECTORY_SEPARATOR . 'assets'
             . DIRECTORY_SEPARATOR . $appDir
             . DIRECTORY_SEPARATOR . $type
+            . DIRECTORY_SEPARATOR . $scope
             . DIRECTORY_SEPARATOR . 'contents'
-            . DIRECTORY_SEPARATOR . $safeName . '.' . $type;
+            . DIRECTORY_SEPARATOR . $contentName . '.' . $type;
 
-        return is_file($diskPath) ? $relativeWebPath : null;
+        if (!is_file($diskPath)) {
+            return null;
+        }
+
+        return '/assets/' . $appDir . '/' . $type . '/' . $scope . '/contents/' . $contentName . '.' . $type;
+    }
+
+    /**
+     * Dispara una respuesta HTTP 404 controlada cuando la vista o el layout no existen en la rama activa.
+     */
+    private function handleNotFound(): void
+    {
+        if (!headers_sent()) {
+            http_response_code(404);
+        }
+
+        echo '404 - Vista no encontrada.';
     }
 }

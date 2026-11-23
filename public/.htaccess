@@ -8,4 +8,3 @@
     # Redirigir el resto del tráfico al punto de entrada único del framework
     RewriteRule ^(.*)$ index.php?uri=$1 [QSA,L]
 </IfModule>
-
